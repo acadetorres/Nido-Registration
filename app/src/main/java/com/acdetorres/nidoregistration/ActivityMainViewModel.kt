@@ -1,0 +1,243 @@
+package com.acdetorres.nidoregistration
+
+import android.content.Context
+import android.graphics.Bitmap
+import android.util.Log
+import android.util.Patterns
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.acdetorres.nidoregistration.dao.Form
+import com.google.gson.Gson
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.text.DateFormat
+import java.util.Date
+import javax.inject.Inject
+
+@HiltViewModel
+class ActivityMainViewModel @Inject constructor(private val repository: AppRepository, @ApplicationContext val context : Context) :ViewModel() {
+
+    var didSign = false
+
+    var didAgree = false
+
+    var signImage : Bitmap? = null
+
+    private val mError = MutableLiveData<String>()
+
+    val error : LiveData<String> get() = mError
+
+    val mSuccessSubmit = MutableLiveData<Boolean>()
+
+    val successSubmit : LiveData<Boolean> get() = mSuccessSubmit
+
+
+    private val mLoading = MutableLiveData<Boolean>()
+
+    val loading : LiveData<Boolean> get() = mLoading
+
+    val count : LiveData<Int> get() = mCount
+
+    private val mCount = MutableLiveData<Int> ()
+
+    suspend fun deleteAllRecords() {
+        repository.deleteAllRecords().collect {
+            it.handleRepositoryFlowResponse()
+        }
+    }
+
+    suspend fun getAllRecords () {
+        repository.getAllRecords().collect {
+            val data = it.handleRepositoryFlowResponse()
+
+            data?.forEach {
+
+                Log.d("json name", it.firstName )
+                val json = Gson().fromJson<List<String>>(it.ages, ArrayList::class.java)
+                json.forEach {
+                    Log.d("json foreach", it)
+                }
+            }
+        }
+    }
+
+    fun submitForm(
+        relationship: String,
+        firstName: String,
+        lastName: String,
+        dob: String,
+        contactNum: String,
+        email: String,
+        numOfChild: String,
+        agesChildren: List<String>,
+        currentBrand: String,
+        timeStamp: String
+    ) {
+//        val form = Form(
+//            System.currentTimeMillis(),
+//            "a",
+//            "b",
+//            "c",
+//            "d",
+//            "e",
+//            "f",
+//            "g",
+//            Gson().toJson(listOf("a","b")),
+//            "j",
+//            "k")
+
+         val form = Form(
+             System.currentTimeMillis(),
+             relationship,
+             firstName,
+             lastName,
+             dob,
+             contactNum,
+             email,
+             numOfChild,
+             Gson().toJson(agesChildren),
+             currentBrand,
+             timeStamp)
+
+
+        Log.d("Ages Prior Convert", agesChildren.toString())
+        Log.d("JSON Convert", form.ages)
+
+         val isFormValid = validateForm(form)
+
+
+         if (isFormValid && didSign) {
+
+             val img = signImage?.let {
+                 storeImage(it, timeStamp)
+             }
+
+             if (!img.isNullOrEmpty()) {
+                 viewModelScope.launch (IO){
+                     repository.insertSubmit(form).collect {
+                         val data = it.handleRepositoryFlowResponse()
+
+                         if (data != null) {
+                             getRecordsCount()
+                             mSuccessSubmit.postValue(true)
+                             mSuccessSubmit.postValue(false)
+                         }
+
+                     }
+                 }
+             }
+
+
+
+         }
+
+    }
+
+    private fun storeImage(image: Bitmap, timeStamp: String) : String{
+        try {
+            val mImageName = "$timeStamp.jpg"
+            val fos = context.openFileOutput(mImageName, AppCompatActivity.MODE_PRIVATE)
+            image.compress(Bitmap.CompressFormat.PNG, 90, fos)
+            fos.close()
+            return mImageName
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return ""
+    }
+
+    suspend fun getRecordsCount() {
+
+
+        repository.getRecordsCount().collect {
+            val resultCount = it.handleRepositoryFlowResponse()
+
+            resultCount?.let {result ->
+                mCount.postValue(result)
+            }
+
+        }
+    }
+
+    private fun validateForm(form: Form): Boolean {
+
+        if (!didSign) {
+            mError.value = "Needs to sign to submit"
+            return false
+        }
+
+        if (!didAgree) {
+            mError.value = "Please agree to data privacy consent"
+            return false
+        }
+
+        if (form.firstName.isEmpty()) {
+            mError.value = "First name is empty"
+            return false
+        }
+
+        if (form.lastName.isEmpty()) {
+            mError.value = "Last name is empty"
+            return false
+        }
+
+        if (form.relationship.isEmpty()) {
+            mError.value = "Relationship is empty"
+            return false
+        }
+
+        if (form.dob.isEmpty()) {
+            mError.value = "Date of birth is empty"
+            return false
+        }
+
+        if (form.contactNum.isEmpty()) {
+            mError.value = "Contact number is empty"
+            return false
+        }
+
+        if (form.email.isEmpty()) {
+            mError.value = "Email is empty"
+            return false
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(form.email).matches()) {
+            mError.value = "Email is not valid format"
+            return false
+        }
+
+        return true
+
+    }
+
+    private fun setLoadingState(loading : Boolean) {
+            viewModelScope.launch(Main) {
+                mLoading.value = (loading)
+            }
+        }
+
+        private fun <T:Any> AppState<T>.handleRepositoryFlowResponse() : T? {
+            when (this) {
+
+                AppState.Error -> {}
+                is AppState.Progress -> {
+                    setLoadingState(this.isLoading)
+                }
+                is AppState.Success -> {
+                    Log.d("handleRepositoryFlowResponse", data.toString())
+                    return this.data
+                }
+            }
+            return null
+        }
+
+
+}

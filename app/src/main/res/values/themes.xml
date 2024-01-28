@@ -1,0 +1,36 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.NidoRegistration" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+
+    <style name="radioButton">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/black</item>
+        //red is the color of the pressed state and activated state
+        <item name="colorControlActivated">@color/nido_color</item>
+        //black is the color of the normal state
+        <item name="colorControlNormal">@android:color/black</item>
+    </style>
+
+    <style name="defaultText">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="forms_generic" >
+        <item name="android:background">@drawable/shape_forms_radius</item>
+        <item name="singleLine">true</item>
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:lines">1</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+
+    <style name="Theme.NidoRegistration" parent="Base.Theme.NidoRegistration" />
+</resources>
