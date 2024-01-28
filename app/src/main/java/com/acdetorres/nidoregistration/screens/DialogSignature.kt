@@ -1,4 +1,4 @@
-package com.acdetorres.nidoregistration
+package com.acdetorres.nidoregistration.screens
 
 import android.content.res.Resources
 import android.graphics.Bitmap

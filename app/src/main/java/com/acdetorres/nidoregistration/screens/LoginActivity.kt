@@ -1,4 +1,4 @@
-package com.acdetorres.nidoregistration
+package com.acdetorres.nidoregistration.screens
 
 import android.content.Intent
 import android.os.Build
@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.activity.viewModels
+import com.acdetorres.nidoregistration.ActivityMainViewModel
 import com.acdetorres.nidoregistration.databinding.ActivityLoginBinding
 import dagger.hilt.android.AndroidEntryPoint
 

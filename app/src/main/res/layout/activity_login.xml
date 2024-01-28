@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:background="@drawable/iv_background_marian"
-    tools:context=".LoginActivity">
+    tools:context=".screens.LoginActivity">
 
     <TextView
         android:layout_width="wrap_content"

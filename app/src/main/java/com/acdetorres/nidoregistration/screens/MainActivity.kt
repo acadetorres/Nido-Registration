@@ -1,23 +1,28 @@
-package com.acdetorres.nidoregistration
+package com.acdetorres.nidoregistration.screens
 
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
-import android.text.Editable
 import android.util.Log
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.RadioButton
-import android.widget.SpinnerAdapter
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.viewModelScope
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import com.acdetorres.nidoregistration.ActivityMainViewModel
+import com.acdetorres.nidoregistration.clearText
 import com.acdetorres.nidoregistration.databinding.ActivityMainBinding
+import com.acdetorres.nidoregistration.screens.fragments.FragmentViewPager
+import com.acdetorres.nidoregistration.string
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -203,6 +208,48 @@ class MainActivity : AppCompatActivity() {
                     etBrandMilk.string(),
                     System.currentTimeMillis().toString()
                 )
+            }
+
+            vp.currentItem = 2
+
+            var didAgree = false
+
+            val onAgree : (Boolean) -> Unit = { it ->
+
+                didAgree = it
+                vp.currentItem = 2
+
+            }
+
+            vp.registerOnPageChangeCallback(object : OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    if (!didAgree && position > 1) {
+                        vp.currentItem = 1
+                        Toast.makeText(this@MainActivity, "Please agree to terms and conditions", Toast.LENGTH_SHORT).show()
+                    }
+//                    super.onPageSelected(position)
+
+                }
+
+
+//                    super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+
+            })
+
+
+            vp.adapter = object : FragmentStateAdapter (this@MainActivity) {
+
+                override fun getItemCount(): Int {
+                    return 3
+                }
+
+                override fun createFragment(position: Int): Fragment {
+
+
+                    return FragmentViewPager(position, onAgree)
+
+
+                }
             }
 
 

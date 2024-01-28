@@ -1,4 +1,4 @@
-package com.acdetorres.nidoregistration
+package com.acdetorres.nidoregistration.screens
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
