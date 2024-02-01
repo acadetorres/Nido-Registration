@@ -12,7 +12,8 @@ import com.bumptech.glide.Glide
 
 class FragmentViewPager(
     val position: Int,
-    val onAgree: (Boolean) -> Unit
+    val onAgree: (Boolean) -> Unit,
+    val dontSkip : () -> Unit,
 ) : Fragment() {
 
     var mBinding : FragmentViewPagerBinding? = null
@@ -44,18 +45,39 @@ class FragmentViewPager(
                 1 -> {
                     R.drawable.probing2
                 }
+                2 -> {
+                    R.drawable.functionalbenefit1
+                }
+                3 -> {
+                    R.drawable.functionalbenefit2
+                }
+                4 -> {
+                    R.drawable.functionalbenefit3
+                }
+                5 -> {
+                    R.drawable.functionalbenefit4
+                }
 
                 else -> {
-                    R.drawable.ic_dropdown
+                    R.drawable.probing
                 }
             }
-            Glide.with(ivIntro)
-                .load(img)
-                .into(ivIntro)
+
+            if (position != 6) {
+                Glide.with(ivIntro)
+                    .load(img)
+                    .into(ivIntro)
+            }
 
             if (position == 1) {
-                view.setOnClickListener {
+                vIAgree.setOnClickListener {
                     onAgree(true)
+                }
+            }
+
+            if (position == 2) {
+                view.setOnClickListener {
+                    dontSkip()
                 }
             }
         }

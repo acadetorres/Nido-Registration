@@ -1,24 +1,33 @@
 package com.acdetorres.nidoregistration.screens
 
+import android.app.ActionBar.LayoutParams
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
+import android.view.ContextThemeWrapper
+import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.acdetorres.nidoregistration.ActivityMainViewModel
+import com.acdetorres.nidoregistration.R
 import com.acdetorres.nidoregistration.clearText
 import com.acdetorres.nidoregistration.databinding.ActivityMainBinding
 import com.acdetorres.nidoregistration.screens.fragments.FragmentViewPager
@@ -72,6 +81,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -116,7 +126,8 @@ class MainActivity : AppCompatActivity() {
                 if (it != null) {
                     DialogNotice("Successfully submitted registrant", "Success", object : DialogNotice.OnSuccessListener {
                         override fun onSuccess() {
-                            resetFields()
+                            startActivity(Intent(this@MainActivity, MainActivity::class.java))
+                            finish()
                         }
 
                     }).show(supportFragmentManager, null)
@@ -221,11 +232,27 @@ class MainActivity : AppCompatActivity() {
 
             }
 
+            val dontSkip : () -> Unit = {
+                vp.currentItem = 3
+            }
+
             vp.registerOnPageChangeCallback(object : OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
+
+                    if (position == 1) {
+                        didAgree = false
+                    }
                     if (!didAgree && position > 1) {
                         vp.currentItem = 1
                         Toast.makeText(this@MainActivity, "Please agree to terms and conditions", Toast.LENGTH_SHORT).show()
+                    }
+
+                    if (position > 4) {
+                        drawer.visibility = View.VISIBLE
+                    }
+
+                    if (position == 6) {
+                        vp.visibility = View.GONE
                     }
 //                    super.onPageSelected(position)
 
@@ -240,17 +267,91 @@ class MainActivity : AppCompatActivity() {
             vp.adapter = object : FragmentStateAdapter (this@MainActivity) {
 
                 override fun getItemCount(): Int {
-                    return 3
+                    return 7
                 }
 
                 override fun createFragment(position: Int): Fragment {
 
 
-                    return FragmentViewPager(position, onAgree)
+                    return FragmentViewPager(position, onAgree, dontSkip)
 
 
                 }
             }
+
+
+            val formsAgesThemeContext = ContextThemeWrapper(this@MainActivity, R.style.forms_ages)
+
+
+
+            val linearLayoutParams = LinearLayout.LayoutParams(0,LayoutParams.WRAP_CONTENT, 1.0f)
+
+            linearLayoutParams.setMargins(0, 0, 10, 0)
+
+            val scale = resources.displayMetrics.density
+            val dpAsPixels = (3 * scale + 0.5f)
+
+
+//            vp.visibility= View.GONE
+//            drawer.visibility = View.VISIBLE
+
+            val numOfChild = MutableLiveData(1)
+
+            etNumChild.doOnTextChanged { text, start, before, count ->
+                if (text?.isEmpty() == true) {
+                    numOfChild.value = 1
+                } else {
+                    numOfChild.value = text.toString().toInt()
+                }
+            }
+
+            numOfChild.observe(this@MainActivity) {
+                val childrenSize = llAgesChildren.children.count()
+
+                llAgesChildren.removeAllViews()
+
+                for (i in 1..it) {
+                    val newEt = EditText(formsAgesThemeContext, null, R.style.forms_ages)
+
+                    newEt.focusable = View.FOCUSABLE
+
+                    newEt.isEnabled = true
+
+                    newEt.isFocusable = true
+
+                    newEt.layoutParams = linearLayoutParams
+
+                    newEt.isFocusableInTouchMode = true
+
+                    newEt.inputType = InputType.TYPE_CLASS_NUMBER
+
+                    newEt.setPadding(10, 10, 10,10)
+
+                    llAgesChildren.addView(newEt)
+                }
+            }
+
+            for (i in 0..5) {
+//                val newEt = EditText(formsAgesThemeContext, null, R.style.forms_ages)
+//
+//                newEt.focusable = View.FOCUSABLE
+//
+//                newEt.isEnabled = true
+//
+//                newEt.isFocusable = true
+//
+//                newEt.layoutParams = linearLayoutParams
+//
+//                newEt.isFocusableInTouchMode = true
+//
+//
+//                newEt.setPadding(20, 20, 0,0)
+//
+//
+//
+//                llAgesChildren.addView(newEt)
+            }
+//            llAgesChildren.removeViewAt(llAgesChildren.children.count() -1)
 
 
 

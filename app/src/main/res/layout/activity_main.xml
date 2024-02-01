@@ -9,6 +9,7 @@
     >
 
     <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
@@ -370,6 +371,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         style="@style/forms_generic"
+        android:inputType="number"
         app:layout_constraintTop_toTopOf="@id/et_email_address"
         app:layout_constraintStart_toStartOf="@id/tv_num_child"
         app:layout_constraintEnd_toEndOf="@id/v_divider"
@@ -414,42 +416,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 >
-
-                <EditText
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    style="@style/forms_generic"
-                    android:layout_marginEnd="10dp"
-                    />
-
-
-                <EditText
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    style="@style/forms_generic"
-                    android:layout_marginEnd="10dp"
-                    />
-
-
-                <EditText
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    style="@style/forms_generic"
-                    android:layout_marginEnd="10dp"
-                    />
-
-
-                <EditText
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    style="@style/forms_generic"
-                    android:layout_marginEnd="10dp"
-                    />
-
 
 
             </LinearLayout>

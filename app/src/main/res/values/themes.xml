@@ -31,6 +31,18 @@
         <item name="android:textColor">@color/black</item>
     </style>
 
+    <style name="forms_ages" >
+        <item name="android:background">@drawable/shape_forms_radius</item>
+        <item name="singleLine">true</item>
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:lines">1</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:layout_marginEnd">10dp</item>
+    </style>
+
 
     <style name="Theme.NidoRegistration" parent="Base.Theme.NidoRegistration" />
 </resources>
