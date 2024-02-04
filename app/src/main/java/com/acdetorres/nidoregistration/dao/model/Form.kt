@@ -1,4 +1,4 @@
-package com.acdetorres.nidoregistration.dao
+package com.acdetorres.nidoregistration.dao.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

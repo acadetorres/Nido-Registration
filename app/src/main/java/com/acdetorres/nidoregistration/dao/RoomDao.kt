@@ -2,7 +2,11 @@ package com.acdetorres.nidoregistration.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.acdetorres.nidoregistration.dao.model.Ambassador
+import com.acdetorres.nidoregistration.dao.model.Form
+import com.acdetorres.nidoregistration.dao.model.LoggedOnAmbassador
 
 @Dao
 interface RoomDao {
@@ -23,6 +27,22 @@ interface RoomDao {
     @Insert(entity = Form::class)
     fun insertFormEntry(
         form: Form
+    ) : Long
+
+    @Insert(entity = Ambassador::class, onConflict = OnConflictStrategy.REPLACE)
+    fun insertAmbassadors(
+        ambassador : List<Ambassador>
+    ) : List<Long>
+
+    @Query("SELECT * FROM ambassadors")
+    fun getAmbassadors() : List<Ambassador>
+
+    @Query("Select * FROM loggedonambassador")
+    fun getLoggedOnAmbassador() : LoggedOnAmbassador
+
+    @Insert(entity = LoggedOnAmbassador::class, onConflict = OnConflictStrategy.REPLACE)
+    fun insertLoggedOnAmbassador(
+        ambassador: LoggedOnAmbassador
     ) : Long
 
 }

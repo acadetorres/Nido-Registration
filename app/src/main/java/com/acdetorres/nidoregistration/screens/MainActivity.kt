@@ -57,10 +57,9 @@ class MainActivity : AppCompatActivity() {
         mBinding = null
     }
 
-    private fun storeImage(image: Bitmap) {
+    private fun storeImage(image: Bitmap, timeStamp: String) {
         try {
-            val timeStamp: String = getDateInstance().format(Date())
-            val mImageName = "MI_$timeStamp.jpg"
+            val mImageName = "$timeStamp.jpg"
             val fos = openFileOutput(mImageName, MODE_PRIVATE)
             image.compress(Bitmap.CompressFormat.PNG, 90, fos)
             fos.close()
@@ -90,6 +89,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.viewModelScope.launch(IO) {
             viewModel.getRecordsCount()
             viewModel.getAllRecords()
+            viewModel.getLocalAmbassadors()
         }
 
         binding?.run {
@@ -123,7 +123,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             viewModel.successSubmit.observe(this@MainActivity) {
-                if (it != null) {
+                val isSuccessRegistration = it.first
+                val timeStamp = it.second
+
+                if (isSuccessRegistration) {
+
+                    viewModel.signImage?.let { it1 -> storeImage(it1, timeStamp) }
+
                     DialogNotice("Successfully submitted registrant", "Success", object : DialogNotice.OnSuccessListener {
                         override fun onSuccess() {
                             startActivity(Intent(this@MainActivity, MainActivity::class.java))
@@ -386,6 +392,7 @@ class MainActivity : AppCompatActivity() {
             viewModel.didSign = false
         }
     }
+
 
 
     override fun onResume() {

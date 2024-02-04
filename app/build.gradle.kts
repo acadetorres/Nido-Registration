@@ -64,6 +64,8 @@ dependencies {
     implementation ("com.github.bumptech.glide:glide:4.16.0")
 
     implementation ("com.github.gcacace:signature-pad:1.3.1")
+    implementation ("org.springframework.security:spring-security-crypto:5.7.2")
+    implementation ("commons-logging:commons-logging-api:1.1")
 }
 
 kapt {

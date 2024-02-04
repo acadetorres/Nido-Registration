@@ -9,7 +9,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.acdetorres.nidoregistration.dao.Form
+import com.acdetorres.nidoregistration.dao.model.Form
+import com.acdetorres.nidoregistration.dao.model.Ambassador
+import com.acdetorres.nidoregistration.dao.model.LoggedOnAmbassador
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -18,8 +20,6 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.text.DateFormat
-import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,9 +35,9 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
 
     val error : LiveData<String> get() = mError
 
-    val mSuccessSubmit = MutableLiveData<Boolean>()
+    val mSuccessSubmit = MutableLiveData<Pair<Boolean, String>>()
 
-    val successSubmit : LiveData<Boolean> get() = mSuccessSubmit
+    val successSubmit : LiveData<Pair<Boolean, String>> get() = mSuccessSubmit
 
 
     private val mLoading = MutableLiveData<Boolean>()
@@ -47,6 +47,60 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
     val count : LiveData<Int> get() = mCount
 
     private val mCount = MutableLiveData<Int> ()
+
+   private val mAmbassadors = MutableLiveData<List<Ambassador>?>()
+
+    val ambassador : LiveData<List<Ambassador>?> get () = mAmbassadors
+
+    val loggedOnAmbassador : LiveData<LoggedOnAmbassador> get () = mLoggedOnAmbassador
+
+    private val mLoggedOnAmbassador = MutableLiveData<LoggedOnAmbassador> ()
+
+    fun getLoggedOnAmbassador() {
+        viewModelScope.launch(IO) {
+            repository.getLoggedOnAmbassador().collect {
+                mLoggedOnAmbassador.postValue(it.handleRepositoryFlowResponse())
+            }
+        }
+    }
+    fun insertLoggedOnAmbassador(ambassador: Ambassador) {
+        viewModelScope.launch (IO){
+            repository.insertLoggedOnAmbassador(ambassador).collect {
+                it.handleRepositoryFlowResponse()
+            }
+        }
+    }
+    fun getAmbassadors() {
+        viewModelScope.launch(IO) {
+            repository.getAmbassadors().collect() {
+                val data = it.handleRepositoryFlowResponse()
+
+                data?.data?.let { ambassadors ->
+                    if (ambassadors.isNotEmpty()) {
+                        viewModelScope.launch(Main) {
+                            mAmbassadors.value = ambassadors
+                        }
+                        repository.insertAmbassadors(ambassadors).collect { result ->
+                            result.handleRepositoryFlowResponse()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun getLocalAmbassadors() {
+        viewModelScope.launch(IO) {
+            repository.getLocalAmbassadors().collect {
+
+                val data = it.handleRepositoryFlowResponse()
+                mAmbassadors.postValue(data)
+
+                Log.d("ambassadors", ambassador.value.toString())
+            }
+
+        }
+    }
 
     suspend fun deleteAllRecords() {
         repository.deleteAllRecords().collect {
@@ -127,8 +181,7 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
 
                          if (data != null) {
                              getRecordsCount()
-                             mSuccessSubmit.postValue(true)
-                             mSuccessSubmit.postValue(false)
+                             mSuccessSubmit.postValue(Pair(true, timeStamp))
                          }
 
                      }
@@ -227,13 +280,16 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
         private fun <T:Any> AppState<T>.handleRepositoryFlowResponse() : T? {
             when (this) {
 
-                AppState.Error -> {}
                 is AppState.Progress -> {
                     setLoadingState(this.isLoading)
                 }
                 is AppState.Success -> {
                     Log.d("handleRepositoryFlowResponse", data.toString())
                     return this.data
+                }
+
+                is AppState.Error -> {
+                    mError.postValue(message)
                 }
             }
             return null

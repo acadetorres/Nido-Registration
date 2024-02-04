@@ -31,13 +31,12 @@ class AppModule {
             .connectTimeout(2, TimeUnit.MINUTES)
             .writeTimeout(2, TimeUnit.MINUTES)
             .addInterceptor { chain ->
-                chain.proceed(chain.request())
-//                chain.proceed(
-//                    chain.request().newBuilder().addHeader(
-//                        "Authorization", "Basic ${BuildConfig.AUTHORIZATIONKEY}"
-//                    )
-//                        .build()
-//                )
+                chain.proceed(
+                    chain.request().newBuilder().addHeader(
+                        "Authorization", "Basic YWRtaW46S2FyZW5NYWdhbmRh"
+                    )
+                        .build()
+                )
             }
 
 //        val loggingInterceptor = HttpLoggingInterceptor()
@@ -56,7 +55,7 @@ class AppModule {
 //
 //        }
         return Retrofit.Builder()
-            .baseUrl("https://mizmoph.com/")
+            .baseUrl("http://10.0.2.2/nido/api/")
             .client(okHttpClient.build())
             .addConverterFactory(GsonConverterFactory.create())
             .addConverterFactory(ScalarsConverterFactory.create())
@@ -85,7 +84,9 @@ class AppModule {
     fun provideDb(
         @ApplicationContext context: Context
     ) : AppDB {
-        return Room.databaseBuilder(context, AppDB::class.java, "AppDB").build()
+        return Room.databaseBuilder(context, AppDB::class.java, "AppDB")
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
 

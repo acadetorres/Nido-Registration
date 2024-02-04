@@ -29,9 +29,11 @@
         />
 
     <EditText
+        android:id="@+id/et_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/forms_generic"
+        android:inputType="textEmailAddress"
         android:layout_marginStart="400dp"
         android:layout_marginEnd="400dp"
         />
@@ -48,6 +50,7 @@
 
 
         <EditText
+            android:id="@+id/et_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/forms_generic"
