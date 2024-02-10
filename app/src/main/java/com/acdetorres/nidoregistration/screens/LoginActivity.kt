@@ -1,9 +1,12 @@
 package com.acdetorres.nidoregistration.screens
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.AttributeSet
 import android.util.Log
+import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
@@ -32,10 +35,23 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mBinding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding?.root)
 
-        fullScreen()
+        mBinding = ActivityLoginBinding.inflate(layoutInflater)
+
+        viewModel.getLoggedOnAmbassador()
+
+        viewModel.loggedOnAmbassador.observe(this@LoginActivity) { loggedOnAmbassador ->
+            if (loggedOnAmbassador != null) {
+                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                finish()
+            } else {
+
+                setContentView(binding?.root)
+                fullScreen()
+            }
+
+        }
+
 
         viewModel.getAmbassadors()
 
@@ -46,13 +62,15 @@ class LoginActivity : AppCompatActivity() {
         binding?.run {
 
 
-            viewModel.loggedOnAmbassador.observe(this@LoginActivity) { loggedOnAmbassador ->
-                if (loggedOnAmbassador != null) {
-                    startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                    finish()
-                }
 
-            }
+//
+//            viewModel.loggedOnAmbassador.observe(this@LoginActivity) { loggedOnAmbassador ->
+//                if (loggedOnAmbassador != null) {
+//                    startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+//                    finish()
+//                }
+//
+//            }
 
             viewModel.ambassador.observe(this@LoginActivity) { ambassadors ->
 
@@ -103,6 +121,13 @@ class LoginActivity : AppCompatActivity() {
 
 
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        fullScreen()
+    }
+
 
 
     private fun fullScreen() {

@@ -18,6 +18,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 import javax.inject.Inject
@@ -30,6 +31,8 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
     var didAgree = false
 
     var signImage : Bitmap? = null
+
+    val savedImages = ArrayList<File>()
 
     private val mError = MutableLiveData<String>()
 
@@ -55,6 +58,10 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
     val loggedOnAmbassador : LiveData<LoggedOnAmbassador> get () = mLoggedOnAmbassador
 
     private val mLoggedOnAmbassador = MutableLiveData<LoggedOnAmbassador> ()
+
+    private val mForms = MutableLiveData<List<Form>?> ()
+
+    val forms : MutableLiveData<List<Form>?> get() = mForms
 
     fun getLoggedOnAmbassador() {
         viewModelScope.launch(IO) {
@@ -108,16 +115,21 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
         }
     }
 
-    suspend fun getAllRecords () {
-        repository.getAllRecords().collect {
-            val data = it.handleRepositoryFlowResponse()
+    fun getAllRecords () {
 
-            data?.forEach {
+        viewModelScope.launch(IO) {
+            repository.getAllRecords().collect {
+                val data = it.handleRepositoryFlowResponse()
 
-                Log.d("json name", it.firstName )
-                val json = Gson().fromJson<List<String>>(it.ages, ArrayList::class.java)
-                json.forEach {
-                    Log.d("json foreach", it)
+                mForms.valueOnMain(data)
+
+                data?.forEach {
+
+                    Log.d("json name", it.firstName)
+                    val json = Gson().fromJson<List<String>>(it.ages, ArrayList::class.java)
+                    json.forEach {
+                        Log.d("json foreach", it)
+                    }
                 }
             }
         }
@@ -209,16 +221,17 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
         return ""
     }
 
-    suspend fun getRecordsCount() {
+    fun getRecordsCount() {
 
+        viewModelScope.launch(IO) {
+            repository.getRecordsCount().collect {
+                val resultCount = it.handleRepositoryFlowResponse()
 
-        repository.getRecordsCount().collect {
-            val resultCount = it.handleRepositoryFlowResponse()
+                resultCount?.let { result ->
+                    mCount.postValue(result)
+                }
 
-            resultCount?.let {result ->
-                mCount.postValue(result)
             }
-
         }
     }
 
@@ -294,6 +307,13 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
             }
             return null
         }
+
+
+    fun <T:Any?> MutableLiveData<T>.valueOnMain(data : T) {
+        viewModelScope.launch(Main) {
+            this@valueOnMain.value = data
+        }
+    }
 
 
 }

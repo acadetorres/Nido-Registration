@@ -21,7 +21,8 @@
 
         <activity
             android:name=".screens.LoginActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

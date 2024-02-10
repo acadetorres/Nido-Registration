@@ -1,17 +1,20 @@
 package com.acdetorres.nidoregistration.screens
 
 import android.app.ActionBar.LayoutParams
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
+import android.text.format.DateFormat
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.ArrayAdapter
+import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.RadioButton
@@ -23,23 +26,19 @@ import androidx.core.view.children
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.acdetorres.nidoregistration.ActivityMainViewModel
 import com.acdetorres.nidoregistration.R
+import com.acdetorres.nidoregistration.chooseDate
 import com.acdetorres.nidoregistration.clearText
 import com.acdetorres.nidoregistration.databinding.ActivityMainBinding
 import com.acdetorres.nidoregistration.screens.fragments.FragmentViewPager
 import com.acdetorres.nidoregistration.string
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.text.DateFormat.getDateInstance
-import java.util.Date
 
 
 @AndroidEntryPoint
@@ -61,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         try {
             val mImageName = "$timeStamp.jpg"
             val fos = openFileOutput(mImageName, MODE_PRIVATE)
-            image.compress(Bitmap.CompressFormat.PNG, 90, fos)
+            image.compress(Bitmap.CompressFormat.PNG, 60, fos)
             fos.close()
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
@@ -72,11 +71,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun getStoreImage(fileName : String) {
         try {
-            val img =  this@MainActivity.filesDir.toURI().toString() + "/" + fileName
+            val img =  this@MainActivity.filesDir.toURI().toString() + "/" + fileName + ".jpg"
 
             val file = File(img)
+
+            viewModel.savedImages.add(file)
+
+            Log.d("FILE : ", file.path)
         }catch (e : Exception) {
 
+        }
+    }
+
+    fun getAllImages(fileNames : List<String>) {
+        fileNames.forEach {
+            getStoreImage(it)
         }
     }
 
@@ -86,11 +95,12 @@ class MainActivity : AppCompatActivity() {
         mBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
-        viewModel.viewModelScope.launch(IO) {
-            viewModel.getRecordsCount()
-            viewModel.getAllRecords()
-            viewModel.getLocalAmbassadors()
-        }
+        viewModel.getRecordsCount()
+        viewModel.getAllRecords()
+        viewModel.getLocalAmbassadors()
+        viewModel.getLoggedOnAmbassador()
+
+
 
         binding?.run {
 
@@ -108,15 +118,41 @@ class MainActivity : AppCompatActivity() {
 //
 //            etFirstName.setText("ABCD")
 
+            val context = this@MainActivity
+
+            viewModel.getRecordsCount()
 
 
-            viewModel.error.observe(this@MainActivity) {
-                if (it!= null) {
-                    Toast.makeText(this@MainActivity, "$it", Toast.LENGTH_SHORT).show()
+            viewModel.forms.observe(context) { forms ->
+
+                if (forms != null) {
+
+                    val images = forms.map {
+                        it.timeStamp.toString()
+                    }
+                        getAllImages(images)
+
+
+                    tvSync.setOnClickListener {
+
+                    }
                 }
             }
 
-            viewModel.count.observe(this@MainActivity) {
+            viewModel.loggedOnAmbassador.observe(context) {
+                if (it != null) {
+                    tvAdminName.text = "Hi ${it.fname}"
+                }
+            }
+
+
+            viewModel.error.observe(context) {
+                if (it!= null) {
+                    Toast.makeText(context, "$it", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            viewModel.count.observe(context) {
                 if (it != null) {
                     tvSync.text = "Sync $it Records"
                 }
@@ -146,27 +182,30 @@ class MainActivity : AppCompatActivity() {
             }
 
 
-
-            etDob.doOnTextChanged { text, start, before, count ->
-                if (text != null) {
-                    Log.d("DO ON TEXT", "before $before start $start count $count")
-                    when (text.length) {
-                        2 -> {
-                            if (start != 2) {
-                                etDob.setText("$text/")
-                                etDob.setSelection(etDob.string().length)
-                            }
-                        }
-                        5 -> {
-                            if (start != 5) {
-                                etDob.setText("$text/")
-                                etDob.setSelection(etDob.string().length)
-                            }
-                        }
-                    }
-                }
-
+            etDob.setOnClickListener {
+                etDob.chooseDate(context)
             }
+
+//            etDob.doOnTextChanged { text, start, before, count ->
+//                if (text != null) {
+//                    Log.d("DO ON TEXT", "before $before start $start count $count")
+//                    when (text.length) {
+//                        2 -> {
+//                            if (start != 2) {
+//                                etDob.setText("$text/")
+//                                etDob.setSelection(etDob.string().length)
+//                            }
+//                        }
+//                        5 -> {
+//                            if (start != 5) {
+//                                etDob.setText("$text/")
+//                                etDob.setSelection(etDob.string().length)
+//                            }
+//                        }
+//                    }
+//                }
+//
+//            }
 
             val list = ArrayList<String>()
 
@@ -414,5 +453,9 @@ class MainActivity : AppCompatActivity() {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN
             )
         }
+    }
+
+    fun convertDate(dateInMilliseconds: String, dateFormat: String?): String? {
+        return DateFormat.format(dateFormat, dateInMilliseconds.toLong()).toString()
     }
 }

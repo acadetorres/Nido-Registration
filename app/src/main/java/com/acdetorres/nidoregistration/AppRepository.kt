@@ -1,14 +1,72 @@
 package com.acdetorres.nidoregistration
 
+import android.graphics.Bitmap
 import com.acdetorres.nidoregistration.dao.model.Form
 import com.acdetorres.nidoregistration.dao.RoomDao
 import com.acdetorres.nidoregistration.dao.model.Ambassador
+import com.acdetorres.nidoregistration.dao.model.FormWithFile
 import com.acdetorres.nidoregistration.dao.model.LoggedOnAmbassador
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
+import okhttp3.RequestBody.Companion.toRequestBody
 
 class AppRepository @Inject constructor(val roomDao :RoomDao, val apiService: ApiService ) {
 
+//    suspend fun syncRecords(userId : String, forms : List<FormWithFile>) = flow {
+//
+//        val fNameRequestBody= forms.map {
+//            it.firstName.toRequestBody()
+//        }
+//
+//        val lNameRequestBody = forms.map {
+//            it.lastName.toRequestBody()
+//        }
+//
+//        val contactNum = forms.map {
+//            it.contactNum.toRequestBody()
+//        }
+//
+//        val email = forms.map {
+//            it.email.toRequestBody()
+//        }
+//
+//        val birthday = forms.map {
+//            it.email.toRequestBody()
+//        }
+//
+//        val relationship = forms.map {
+//            it.relationship.toRequestBody()
+//        }
+//
+//        val numOfChild = forms.map {
+//            it.numOfChild.toRequestBody()
+//        }
+//
+//        val currentBrandMilk = forms.map {
+//            it.currentBrand.toRequestBody()
+//        }
+//
+//        val timeStamp = forms.map {
+//            it.timeStamp.toRequestBody()
+//        }
+//
+//
+////        val response = apiService.batchSync(
+////            userId,
+////            fNameRequestBody,
+////            lNameRequestBody,
+////            contactNum,
+////            email,
+////            birthday,
+////            relationship,
+////            numOfChild,
+////            currentBrandMilk,
+////            timeStamp,
+////            childAge,
+////            signatures
+////
+////        )
+//    }
 
     suspend fun getLoggedOnAmbassador() = flow {
         val response = roomDao.getLoggedOnAmbassador()

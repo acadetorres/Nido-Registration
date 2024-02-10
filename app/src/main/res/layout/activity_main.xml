@@ -287,6 +287,7 @@
         android:maxLength="10"
         android:inputType="number"
         style="@style/forms_generic"
+        android:focusable="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/et_last_name"

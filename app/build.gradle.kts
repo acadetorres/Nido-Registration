@@ -66,6 +66,8 @@ dependencies {
     implementation ("com.github.gcacace:signature-pad:1.3.1")
     implementation ("org.springframework.security:spring-security-crypto:5.7.2")
     implementation ("commons-logging:commons-logging-api:1.1")
+
+    implementation ("com.squareup.okhttp3:okhttp:4.9.0")
 }
 
 kapt {

@@ -1,5 +1,7 @@
 package com.acdetorres.nidoregistration
 
+import android.app.DatePickerDialog
+import android.content.Context
 import android.widget.EditText
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.MutableLiveData
@@ -13,6 +15,9 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.retryWhen
 import retrofit2.HttpException
 import java.net.UnknownHostException
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 fun EditText.watchText (): MutableLiveData<String> {
     val str = MutableLiveData<String>()
@@ -34,6 +39,38 @@ fun EditText.string() : String {
     return this.text.toString()
 }
 
+fun EditText.chooseDate(context : Context, yearsRestrict : Int = 0) {
+    val cal = Calendar.getInstance()
+
+    val maxDate = cal.time.time - (31556952000 * yearsRestrict)
+
+    DatePickerDialog(context,
+        { _, year, monthOfYear, dayOfMonth ->
+            cal.set(Calendar.YEAR, year)
+            cal.set(Calendar.MONTH, monthOfYear)
+            cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            updateDateInView(cal, this)
+        },
+        // set DatePickerDialog to point to today's date when it loads up
+        cal.get(Calendar.YEAR),
+        cal.get(Calendar.MONTH),
+        cal.get(Calendar.DAY_OF_MONTH)).also {
+        if (maxDate != 0.toLong()) {
+            it.datePicker.maxDate = maxDate
+        }
+        it.show()
+    }
+
+}
+
+private fun updateDateInView(cal: Calendar, editText : EditText) {
+    val myFormat = "MM/dd/yyyy"
+//        val myFormat = "MM/dd/yyyy" // mention the format you need
+    val sdf = SimpleDateFormat(myFormat, Locale.US)
+
+    editText.setText(sdf.format(cal.time))
+//            viewModel.to = sdf.format(cal.time)
+}
 
 fun <T:Any> Flow<AppState<T>>.applyConnections(
     liveData : Boolean = false,
