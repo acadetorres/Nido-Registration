@@ -28,6 +28,8 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
 
     var didSign = false
 
+    var didChooseParent = false
+
     var didAgree = false
 
     var signImage : Bitmap? = null
@@ -145,7 +147,11 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
         numOfChild: String,
         agesChildren: List<String>,
         currentBrand: String,
-        timeStamp: String
+        timeStamp: String,
+        parent : Boolean,
+        province : String,
+        city : String,
+        barangay : String
     ) {
 //        val form = Form(
 //            System.currentTimeMillis(),
@@ -171,7 +177,11 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
              numOfChild,
              Gson().toJson(agesChildren),
              currentBrand,
-             timeStamp)
+             timeStamp,
+             parent,
+             province,
+             city,
+             barangay)
 
 
         Log.d("Ages Prior Convert", agesChildren.toString())
@@ -182,11 +192,11 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
 
          if (isFormValid && didSign) {
 
-             val img = signImage?.let {
-                 storeImage(it, timeStamp)
-             }
+//             val img = signImage?.let {
+//                 storeImage(it, timeStamp)
+//             }
 
-             if (!img.isNullOrEmpty()) {
+//             if (!img.isNullOrEmpty()) {
                  viewModelScope.launch (IO){
                      repository.insertSubmit(form).collect {
                          val data = it.handleRepositoryFlowResponse()
@@ -198,7 +208,7 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
 
                      }
                  }
-             }
+//             }
 
 
 
@@ -237,8 +247,27 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
 
     private fun validateForm(form: Form): Boolean {
 
+        if (form.province.isEmpty()) {
+            mError.value = "Please select a province"
+            return false
+        }
+
+        if (form.city.isEmpty()) {
+            mError.value = "Please input city"
+            return false
+        }
+
+        if (form.barangay.isEmpty()) {
+            mError.value = "Please input barangay"
+            return false
+        }
+
+        if (!didChooseParent) {
+            mError.value = "Please choose your relationship"
+            return false
+        }
         if (!didSign) {
-            mError.value = "Needs to sign to submit"
+            mError.value = "Needs to consent to submit"
             return false
         }
 

@@ -18,6 +18,10 @@ data class Form (
     val ages : String,
     val currentBrand : String,
     val signatureName : String,
+    val parent : Boolean,
+    val province : String,
+    val city : String,
+    val barangay : String,
     @PrimaryKey(autoGenerate = true)
     val id : Int = 0,
     )

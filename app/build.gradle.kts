@@ -68,6 +68,10 @@ dependencies {
     implementation ("commons-logging:commons-logging-api:1.1")
 
     implementation ("com.squareup.okhttp3:okhttp:4.9.0")
+
+
+    //Logger
+    implementation ("com.jakewharton.timber:timber:5.0.1")
 }
 
 kapt {

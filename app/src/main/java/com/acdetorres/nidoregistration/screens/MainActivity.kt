@@ -1,9 +1,11 @@
 package com.acdetorres.nidoregistration.screens
 
 import android.app.ActionBar.LayoutParams
-import android.app.DatePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
+import android.media.MediaPlayer
+import android.media.MediaPlayer.OnCompletionListener
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
@@ -14,7 +16,6 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.ArrayAdapter
-import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.RadioButton
@@ -26,19 +27,26 @@ import androidx.core.view.children
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.acdetorres.nidoregistration.ActivityMainViewModel
 import com.acdetorres.nidoregistration.R
 import com.acdetorres.nidoregistration.chooseDate
 import com.acdetorres.nidoregistration.clearText
+import com.acdetorres.nidoregistration.dao.model.Provinces
 import com.acdetorres.nidoregistration.databinding.ActivityMainBinding
 import com.acdetorres.nidoregistration.screens.fragments.FragmentViewPager
 import com.acdetorres.nidoregistration.string
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.net.URI
 
 
 @AndroidEntryPoint
@@ -100,9 +108,47 @@ class MainActivity : AppCompatActivity() {
         viewModel.getLocalAmbassadors()
         viewModel.getLoggedOnAmbassador()
 
+        val regionsString = this.assets.open("provinces.json").bufferedReader().use {
+            it.readText()
+        }
+
+        val provinces = Gson().fromJson(regionsString, Provinces::class.java)
+
+        val provincesList = provinces.map {
+            it.name
+        }.toMutableList()
+
+        provincesList.add(0, "")
+
+
+
+        Timber.e(regionsString)
+
+//        Timber.e("Gumagana ba")
+
+
 
 
         binding?.run {
+
+//            videoView.visibility = View.VISIBLE
+//
+//            videoView.setOnErrorListener { mediaPlayer, i, i2 ->
+//
+//                false
+//            }
+//
+//            videoView.setOnCompletionListener {
+////                startActivity(Intent(this@MainActivity, MainActivity::class.java))
+////                finish()
+//            }
+//
+//            val videoPath = "android.resource://" + packageName + "/" + R.raw.nido
+//
+//            videoView.setVideoURI(Uri.parse(videoPath))
+//
+//            videoView.start()
+
 
 //            etRelationship.setText("ABCD")
 //
@@ -121,6 +167,19 @@ class MainActivity : AppCompatActivity() {
             val context = this@MainActivity
 
             viewModel.getRecordsCount()
+
+
+            sProvinces.adapter = ArrayAdapter (this@MainActivity, R.layout.simple_dropdown_item, provincesList)
+
+
+            rbLegalParent.setOnClickListener {
+                viewModel.didChooseParent = true
+            }
+
+            rbLegalInHousehold.setOnClickListener {
+                viewModel.didChooseParent = true
+            }
+
 
 
             viewModel.forms.observe(context) { forms ->
@@ -168,8 +227,26 @@ class MainActivity : AppCompatActivity() {
 
                     DialogNotice("Successfully submitted registrant", "Success", object : DialogNotice.OnSuccessListener {
                         override fun onSuccess() {
-                            startActivity(Intent(this@MainActivity, MainActivity::class.java))
-                            finish()
+
+                            videoView.visibility = View.VISIBLE
+
+                            lifecycleScope.launch(Main) {
+                                videoView.setOnCompletionListener(object : OnCompletionListener {
+                                    override fun onCompletion(mp: MediaPlayer) {
+                                        startActivity(Intent(this@MainActivity, MainActivity::class.java))
+                                        finish()
+                                    }
+                                })
+
+
+                                val videoPath = "android.resource://" + packageName + "/" + R.raw.nido
+
+                                videoView.setVideoURI(Uri.parse(videoPath))
+
+                                videoView.start()
+                            }
+
+
                         }
 
                     }).show(supportFragmentManager, null)
@@ -221,18 +298,21 @@ class MainActivity : AppCompatActivity() {
 
             sContact.setSelection(63)
 
-
-            tvSignature.setOnClickListener {
-                val onSave : (Bitmap) -> Unit = { img ->
-                    fullScreen()
-                    viewModel.didSign = true
-                    viewModel.signImage = img
-                }
-                val onDelete : () -> Unit = {
-                    viewModel.didSign = false
-                }
-                DialogSignature(onSave, onDelete).show(supportFragmentManager, "")
+            rbConsent.setOnClickListener{
+                viewModel.didSign = rbConsent.isChecked
             }
+
+//            tvSignature.setOnClickListener {
+//                val onSave : (Bitmap) -> Unit = { img ->
+//                    fullScreen()
+//                    viewModel.didSign = true
+//                    viewModel.signImage = img
+//                }
+//                val onDelete : () -> Unit = {
+//                    viewModel.didSign = false
+//                }
+//                DialogSignature(onSave, onDelete).show(supportFragmentManager, "")
+//            }
 
 
             val ages = ArrayList<String>(4)
@@ -262,7 +342,11 @@ class MainActivity : AppCompatActivity() {
                     etNumChild.string(),
                     ages,
                     etBrandMilk.string(),
-                    System.currentTimeMillis().toString()
+                    System.currentTimeMillis().toString(),
+                    rbConsent.isChecked,
+                    sProvinces.selectedItem.toString(),
+                    etCity.string(),
+                    etBarangay.string()
                 )
             }
 
