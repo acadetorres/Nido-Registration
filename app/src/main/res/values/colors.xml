@@ -4,5 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="nido_color">#e5c60c</color>
     <color name="green">#44ab34</color>
+    <color name="dark_green">#12572d</color>
     <color name="grey">#d1d3d4</color>
 </resources>

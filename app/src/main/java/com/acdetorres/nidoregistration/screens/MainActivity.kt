@@ -214,6 +214,15 @@ class MainActivity : AppCompatActivity() {
             viewModel.count.observe(context) {
                 if (it != null) {
                     tvSync.text = "Sync $it Records"
+
+                    tvLogout.setOnClickListener { v ->
+
+                        if (it > 0) {
+
+                            DialogNotice(
+                                "You have ${it} records, you need to sync first or you will lose all records").show(supportFragmentManager, null)
+                        }
+                    }
                 }
             }
 
@@ -376,11 +385,11 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(this@MainActivity, "Please agree to terms and conditions", Toast.LENGTH_SHORT).show()
                     }
 
-                    if (position > 4) {
+                    if (position > 5) {
                         drawer.visibility = View.VISIBLE
                     }
 
-                    if (position == 6) {
+                    if (position == 7) {
                         vp.visibility = View.GONE
                     }
 //                    super.onPageSelected(position)
@@ -396,7 +405,7 @@ class MainActivity : AppCompatActivity() {
             vp.adapter = object : FragmentStateAdapter (this@MainActivity) {
 
                 override fun getItemCount(): Int {
-                    return 7
+                    return 8
                 }
 
                 override fun createFragment(position: Int): Fragment {
@@ -405,6 +414,42 @@ class MainActivity : AppCompatActivity() {
                     return FragmentViewPager(position, onAgree, dontSkip)
 
 
+                }
+            }
+
+            etNumChild.doOnTextChanged { text, start, before, count ->
+
+                etAgesChildren.clearText()
+
+            }
+
+
+            etAgesChildren.doOnTextChanged { text, start, before, count ->
+                if (text != null) {
+                    Log.d("DO ON TEXT", "before $before start $start count $count textLenght ${text.length} numchild empty ${etNumChild.string().isBlank()} ${etNumChild.string().isNotBlank()}")
+                    if (etNumChild.string().isNotBlank()) {
+
+                        if (text.length % 2 != 0 && before == 0 && (text.length / 2 != etNumChild.string()
+                                .toInt())
+                        ) {
+
+                            etAgesChildren.setText("${text},")
+
+
+                        }
+                        if (text.length / 2 == etNumChild.string().toInt()) {
+                            etAgesChildren.setText(text.dropLast(1))
+                        }
+                    } else {
+                        if (etAgesChildren.string().isNotBlank()) {
+                            etAgesChildren.setText("")
+                        }
+                    }
+
+
+                    etAgesChildren.setSelection(etAgesChildren.text.length)
+
+//                    if (c)
                 }
             }
 
@@ -424,41 +469,41 @@ class MainActivity : AppCompatActivity() {
 //            vp.visibility= View.GONE
 //            drawer.visibility = View.VISIBLE
 
-            val numOfChild = MutableLiveData(1)
+//            val numOfChild = MutableLiveData(1)
 
-            etNumChild.doOnTextChanged { text, start, before, count ->
-                if (text?.isEmpty() == true) {
-                    numOfChild.value = 1
-                } else {
-                    numOfChild.value = text.toString().toInt()
-                }
-            }
+//            etNumChild.doOnTextChanged { text, start, before, count ->
+//                if (text?.isEmpty() == true) {
+//                    numOfChild.value = 1
+//                } else {
+//                    numOfChild.value = text.toString().toInt()
+//                }
+//            }
 
-            numOfChild.observe(this@MainActivity) {
-                val childrenSize = llAgesChildren.children.count()
-
-                llAgesChildren.removeAllViews()
-
-                for (i in 1..it) {
-                    val newEt = EditText(formsAgesThemeContext, null, R.style.forms_ages)
-
-                    newEt.focusable = View.FOCUSABLE
-
-                    newEt.isEnabled = true
-
-                    newEt.isFocusable = true
-
-                    newEt.layoutParams = linearLayoutParams
-
-                    newEt.isFocusableInTouchMode = true
-
-                    newEt.inputType = InputType.TYPE_CLASS_NUMBER
-
-                    newEt.setPadding(10, 10, 10,10)
-
-                    llAgesChildren.addView(newEt)
-                }
-            }
+//            numOfChild.observe(this@MainActivity) {
+//                val childrenSize = llAgesChildren.children.count()
+//
+//                llAgesChildren.removeAllViews()
+//
+//                for (i in 1..it) {
+//                    val newEt = EditText(formsAgesThemeContext, null, R.style.forms_ages)
+//
+//                    newEt.focusable = View.FOCUSABLE
+//
+//                    newEt.isEnabled = true
+//
+//                    newEt.isFocusable = true
+//
+//                    newEt.layoutParams = linearLayoutParams
+//
+//                    newEt.isFocusableInTouchMode = true
+//
+//                    newEt.inputType = InputType.TYPE_CLASS_NUMBER
+//
+//                    newEt.setPadding(10, 10, 10,10)
+//
+//                    llAgesChildren.addView(newEt)
+//                }
+//            }
 
             for (i in 0..5) {
 //                val newEt = EditText(formsAgesThemeContext, null, R.style.forms_ages)

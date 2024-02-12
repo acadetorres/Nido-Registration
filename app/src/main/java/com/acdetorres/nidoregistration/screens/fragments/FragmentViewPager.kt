@@ -46,6 +46,10 @@ class FragmentViewPager(
                     R.drawable.probing2
                 }
                 2 -> {
+                    cvSkip.visibility = View.VISIBLE
+                    tvDontSkip.setOnClickListener {
+                        dontSkip()
+                    }
                     R.drawable.functionalbenefit1
                 }
                 3 -> {
@@ -57,13 +61,18 @@ class FragmentViewPager(
                 5 -> {
                     R.drawable.functionalbenefit4
                 }
+                6 -> {
+                    R.drawable.functionalbenefit5
+                }
 
                 else -> {
+                    cvSkip.visibility = View.GONE
                     R.drawable.probing
+
                 }
             }
 
-            if (position != 6) {
+            if (position != 7) {
                 Glide.with(ivIntro)
                     .load(img)
                     .into(ivIntro)
@@ -75,11 +84,11 @@ class FragmentViewPager(
                 }
             }
 
-            if (position == 2) {
-                view.setOnClickListener {
-                    dontSkip()
-                }
-            }
+//            if (position == 2) {
+//                view.setOnClickListener {
+//                    dontSkip()
+//                }
+//            }
         }
 
 

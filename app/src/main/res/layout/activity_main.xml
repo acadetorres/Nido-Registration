@@ -11,76 +11,12 @@
         android:id="@+id/drawer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
-        android:background="@drawable/iv_background_marian"
+        android:visibility="visible"
+        android:background="@drawable/nidobg"
         >
 
 
 
-    <com.google.android.material.navigation.NavigationView
-
-        android:layout_width="400dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:layout_marginEnd="-65dp"
-        android:fitsSystemWindows="true"        >
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center">
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                />
-
-            <TextView
-                android:id="@+id/tv_admin_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Hi Adrian"
-                style="@style/defaultText"
-                />
-
-            <TextView
-                android:id="@+id/tv_sync"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="24sp"
-                android:text="Sync 30 Registrants"
-                android:textAllCaps="true"
-                android:textColor="@color/black"
-                android:background="@drawable/shape_button_radius"
-                android:backgroundTint="@color/green"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:paddingStart="60dp"
-                android:paddingEnd="60dp"
-                />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/defaultText"
-                android:text="Logout"
-                android:padding="30dp"
-                android:layout_gravity="bottom"
-                android:background="@color/nido_color"
-                />
-
-
-        </LinearLayout>
-
-    </com.google.android.material.navigation.NavigationView>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -541,6 +477,17 @@
                 >
 
 
+                <EditText
+                    android:id="@+id/et_ages_children"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="number"
+                    style="@style/forms_generic"
+                    android:layout_marginEnd="10dp"
+                    />
+
+
             </LinearLayout>
 
 
@@ -673,6 +620,73 @@
 
 
     </ScrollView>
+
+        <com.google.android.material.navigation.NavigationView
+
+            android:layout_width="400dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:layout_marginEnd="-65dp"
+            android:fitsSystemWindows="true"        >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_admin_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hi Adrian"
+                    style="@style/defaultText"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_sync"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="24sp"
+                    android:text="Sync 30 Registrants"
+                    android:textAllCaps="true"
+                    android:textColor="@color/black"
+                    android:background="@drawable/shape_button_radius"
+                    android:backgroundTint="@color/green"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:paddingStart="60dp"
+                    android:paddingEnd="60dp"
+                    />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_logout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/defaultText"
+                    android:text="Logout"
+                    android:padding="30dp"
+                    android:layout_gravity="bottom"
+                    android:background="@color/nido_color"
+                    />
+
+
+            </LinearLayout>
+
+        </com.google.android.material.navigation.NavigationView>
+
 
     </androidx.drawerlayout.widget.DrawerLayout>
 
