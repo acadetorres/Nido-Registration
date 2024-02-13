@@ -39,6 +39,8 @@ class LoginActivity : AppCompatActivity() {
 
         viewModel.getLoggedOnAmbassador()
 
+        viewModel.getProvinces()
+
         viewModel.loggedOnAmbassador.observe(this@LoginActivity) { loggedOnAmbassador ->
             if (loggedOnAmbassador != null) {
                 startActivity(Intent(this@LoginActivity, MainActivity::class.java))

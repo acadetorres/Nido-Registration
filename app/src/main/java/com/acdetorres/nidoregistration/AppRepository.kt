@@ -5,6 +5,7 @@ import com.acdetorres.nidoregistration.dao.model.Form
 import com.acdetorres.nidoregistration.dao.RoomDao
 import com.acdetorres.nidoregistration.dao.model.Ambassador
 import com.acdetorres.nidoregistration.dao.model.FormWithFile
+import com.acdetorres.nidoregistration.dao.model.GetProvincesResponse
 import com.acdetorres.nidoregistration.dao.model.LoggedOnAmbassador
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -68,6 +69,17 @@ class AppRepository @Inject constructor(val roomDao :RoomDao, val apiService: Ap
 ////        )
 //    }
 
+    suspend fun insertLocalProvinces(provinces:List<GetProvincesResponse.Province>) = flow {
+        val response = roomDao.insertProvinces(provinces)
+        emit(response)
+    }
+    suspend fun getLocalProvince() = flow {
+        emit(roomDao.getProvinces())
+    }
+    suspend fun getProvinces() = flow {
+        val response = apiService.getProvinces()
+        emit(AppState.Success(response))
+    }.applyConnections()
     suspend fun getLoggedOnAmbassador() = flow {
         val response = roomDao.getLoggedOnAmbassador()
         emit(AppState.Success(response))

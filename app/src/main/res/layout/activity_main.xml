@@ -7,11 +7,14 @@
     tools:context=".screens.MainActivity"
     tools:openDrawer="end"
     >
+
+
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible"
+        android:visibility="invisible"
+
         android:background="@drawable/nidobg"
         >
 

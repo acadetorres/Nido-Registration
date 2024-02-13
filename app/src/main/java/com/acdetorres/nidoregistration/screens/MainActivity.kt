@@ -8,13 +8,14 @@ import android.media.MediaPlayer.OnCompletionListener
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.text.InputType
 import android.text.format.DateFormat
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -26,7 +27,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
@@ -34,7 +34,6 @@ import com.acdetorres.nidoregistration.ActivityMainViewModel
 import com.acdetorres.nidoregistration.R
 import com.acdetorres.nidoregistration.chooseDate
 import com.acdetorres.nidoregistration.clearText
-import com.acdetorres.nidoregistration.dao.model.Provinces
 import com.acdetorres.nidoregistration.databinding.ActivityMainBinding
 import com.acdetorres.nidoregistration.screens.fragments.FragmentViewPager
 import com.acdetorres.nidoregistration.string
@@ -46,7 +45,6 @@ import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.net.URI
 
 
 @AndroidEntryPoint
@@ -107,22 +105,23 @@ class MainActivity : AppCompatActivity() {
         viewModel.getAllRecords()
         viewModel.getLocalAmbassadors()
         viewModel.getLoggedOnAmbassador()
+        viewModel.getLocalProvinces()
 
-        val regionsString = this.assets.open("provinces.json").bufferedReader().use {
-            it.readText()
-        }
+//        val regionsString = this.assets.open("provinces.json").bufferedReader().use {
+//            it.readText()
+//        }
+//
+//        val provinces = Gson().fromJson(regionsString, Provinces::class.java)
+//
+//        val provincesList = provinces.map {
+//            it.name
+//        }.toMutableList()
+//
+//        provincesList.add(0, "")
 
-        val provinces = Gson().fromJson(regionsString, Provinces::class.java)
-
-        val provincesList = provinces.map {
-            it.name
-        }.toMutableList()
-
-        provincesList.add(0, "")
 
 
-
-        Timber.e(regionsString)
+//        Timber.e(regionsString)
 
 //        Timber.e("Gumagana ba")
 
@@ -169,7 +168,6 @@ class MainActivity : AppCompatActivity() {
             viewModel.getRecordsCount()
 
 
-            sProvinces.adapter = ArrayAdapter (this@MainActivity, R.layout.simple_dropdown_item, provincesList)
 
 
             rbLegalParent.setOnClickListener {
@@ -180,16 +178,58 @@ class MainActivity : AppCompatActivity() {
                 viewModel.didChooseParent = true
             }
 
+            viewModel.provinces.observe(context) {
+                if (it != null) {
+
+                    val data = it.sortedBy {
+                        it.provDesc
+                    }
+
+                    val provincesList = data.map {
+                        it.provDesc
+                    }.toMutableList()
+                    provincesList.add(0, "")
+
+                    sProvinces.adapter = ArrayAdapter (this@MainActivity, R.layout.simple_dropdown_item, provincesList)
+                    sProvinces.selectedItemId
+                    
+                    sProvinces.onItemSelectedListener = object : OnItemSelectedListener {
+                        override fun onItemSelected(
+                            p0: AdapterView<*>?,
+                            p1: View?,
+                            position: Int,
+                            p3: Long
+                        ) {
+                            if (position == 0) {
+                                viewModel.selectedProvince = "-1"
+                            } else {
+                                viewModel.selectedProvince = (data[position-1].id)
+                                Log.d("data", data[position-1].toString())
+                            }
+                        }
+
+                        override fun onNothingSelected(p0: AdapterView<*>?) {
+//                            TODO("Not yet implemented")
+                        }
+
+                    }
+
+//                    { adapterView, view, i, l ->
+//                        viewModel.selectedProvince = (it[i-1].id).toString()
+//                    }
+                }
+            }
+
 
 
             viewModel.forms.observe(context) { forms ->
 
                 if (forms != null) {
 
-                    val images = forms.map {
-                        it.timeStamp.toString()
-                    }
-                        getAllImages(images)
+//                    val images = forms.map {
+//                        it.timeStamp.toString()
+//                    }
+//                        getAllImages(images)
 
 
                     tvSync.setOnClickListener {
@@ -232,7 +272,7 @@ class MainActivity : AppCompatActivity() {
 
                 if (isSuccessRegistration) {
 
-                    viewModel.signImage?.let { it1 -> storeImage(it1, timeStamp) }
+//                    viewModel.signImage?.let { it1 -> storeImage(it1, timeStamp) }
 
                     DialogNotice("Successfully submitted registrant", "Success", object : DialogNotice.OnSuccessListener {
                         override fun onSuccess() {
@@ -334,12 +374,12 @@ class MainActivity : AppCompatActivity() {
             }
 
             tvSubmit.setOnClickListener {
-                ages.clear()
-                llAgesChildren.children.forEach { ageEt ->
-                    val age = (ageEt as EditText)
-                    ages.add(age.text.toString())
-                    Log.d("Ages:", ages.toString())
-                }
+//                ages.clear()
+//                llAgesChildren.children.forEach { ageEt ->
+//                    val age = (ageEt as EditText)
+//                    ages.add(age.text.toString())
+//                    Log.d("Ages:", ages.toString())
+//                }
 
                 viewModel.submitForm(
                     etRelationship.string(),
@@ -349,7 +389,7 @@ class MainActivity : AppCompatActivity() {
                     etContactNumber.string(),
                     etEmailAddress.string(),
                     etNumChild.string(),
-                    ages,
+                    etAgesChildren.string(),
                     etBrandMilk.string(),
                     System.currentTimeMillis().toString(),
                     rbConsent.isChecked,

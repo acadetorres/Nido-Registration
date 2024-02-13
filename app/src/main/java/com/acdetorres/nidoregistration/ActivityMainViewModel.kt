@@ -11,12 +11,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.acdetorres.nidoregistration.dao.model.Form
 import com.acdetorres.nidoregistration.dao.model.Ambassador
+import com.acdetorres.nidoregistration.dao.model.GetProvincesResponse
 import com.acdetorres.nidoregistration.dao.model.LoggedOnAmbassador
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileNotFoundException
@@ -25,6 +27,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ActivityMainViewModel @Inject constructor(private val repository: AppRepository, @ApplicationContext val context : Context) :ViewModel() {
+
+    var selectedProvince = "-1"
 
     var didSign = false
 
@@ -62,9 +66,31 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
     private val mLoggedOnAmbassador = MutableLiveData<LoggedOnAmbassador> ()
 
     private val mForms = MutableLiveData<List<Form>?> ()
-
     val forms : MutableLiveData<List<Form>?> get() = mForms
 
+    private val mProvinces = MutableLiveData<List<GetProvincesResponse.Province>?>()
+    val provinces : LiveData<List<GetProvincesResponse.Province>?> get() = mProvinces
+
+    fun getLocalProvinces() {
+        viewModelScope.launch(IO) {
+            repository.getLocalProvince().collect {
+                mProvinces.valueOnMain(it)
+            }
+        }
+    }
+    fun getProvinces() {
+        viewModelScope.launch(IO) {
+            repository.getProvinces().collect {
+                val provinces = it.handleRepositoryFlowResponse()?.data
+
+                if (provinces != null) {
+                    repository.insertLocalProvinces(provinces).collect {
+                        mProvinces.valueOnMain(provinces)
+                    }
+                }
+            }
+        }
+    }
     fun getLoggedOnAmbassador() {
         viewModelScope.launch(IO) {
             repository.getLoggedOnAmbassador().collect {
@@ -128,10 +154,10 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
                 data?.forEach {
 
                     Log.d("json name", it.firstName)
-                    val json = Gson().fromJson<List<String>>(it.ages, ArrayList::class.java)
-                    json.forEach {
-                        Log.d("json foreach", it)
-                    }
+//                    val json = Gson().fromJson<List<String>>(it.ages, ArrayList::class.java)
+//                    json.forEach {
+//                        Log.d("json foreach", it)
+//                    }
                 }
             }
         }
@@ -145,7 +171,7 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
         contactNum: String,
         email: String,
         numOfChild: String,
-        agesChildren: List<String>,
+        agesChildren: String,
         currentBrand: String,
         timeStamp: String,
         parent : Boolean,
@@ -167,7 +193,7 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
 //            "k")
 
          val form = Form(
-             System.currentTimeMillis(),
+             convertDate(System.currentTimeMillis(), "yyyy-MM-dd hh:mm:ss"),
              relationship,
              firstName,
              lastName,
@@ -175,11 +201,11 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
              contactNum,
              email,
              numOfChild,
-             Gson().toJson(agesChildren),
+             agesChildren,
              currentBrand,
              timeStamp,
-             parent,
-             province,
+             if (parent) "1" else "2",
+             selectedProvince,
              city,
              barangay)
 
@@ -247,10 +273,15 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
 
     private fun validateForm(form: Form): Boolean {
 
-        if (form.province.isEmpty()) {
-            mError.value = "Please select a province"
+        if (form.provinceId == "-1") {
+            mError.postValue("Please select a province")
             return false
         }
+
+//        if (form.province.isEmpty()) {
+//            mError.value = "Please select a province"
+//            return false
+//        }
 
         if (form.city.isEmpty()) {
             mError.value = "Please input city"

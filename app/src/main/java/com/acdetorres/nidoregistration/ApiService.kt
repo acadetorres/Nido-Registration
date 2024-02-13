@@ -1,6 +1,7 @@
 package com.acdetorres.nidoregistration
 
 import com.acdetorres.nidoregistration.dao.model.GetAmbassadorsResponse
+import com.acdetorres.nidoregistration.dao.model.GetProvincesResponse
 import com.acdetorres.nidoregistration.dao.model.MetaResponse
 import kotlinx.coroutines.flow.flow
 import okhttp3.MultipartBody
@@ -12,6 +13,9 @@ import retrofit2.http.Part
 import retrofit2.http.Path
 
 interface ApiService {
+
+    @GET("registration_api/provinces")
+    suspend fun getProvinces() : GetProvincesResponse
 
     @GET("registration_api/get_ambassadors")
     suspend fun getAmbassadors(): GetAmbassadorsResponse

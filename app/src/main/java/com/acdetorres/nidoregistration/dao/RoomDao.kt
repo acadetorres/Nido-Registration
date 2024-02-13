@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.acdetorres.nidoregistration.dao.model.Ambassador
 import com.acdetorres.nidoregistration.dao.model.Form
+import com.acdetorres.nidoregistration.dao.model.GetProvincesResponse
 import com.acdetorres.nidoregistration.dao.model.LoggedOnAmbassador
 
 @Dao
@@ -44,5 +45,13 @@ interface RoomDao {
     fun insertLoggedOnAmbassador(
         ambassador: LoggedOnAmbassador
     ) : Long
+
+    @Insert(entity = GetProvincesResponse.Province::class, onConflict = OnConflictStrategy.REPLACE)
+    fun insertProvinces(
+        provinces: List<GetProvincesResponse.Province>
+    ) : List<Long>
+
+    @Query("Select * FROM province")
+    fun getProvinces() : List<GetProvincesResponse.Province>
 
 }

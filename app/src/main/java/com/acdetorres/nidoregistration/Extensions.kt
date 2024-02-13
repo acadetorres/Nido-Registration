@@ -2,6 +2,7 @@ package com.acdetorres.nidoregistration
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.text.format.DateFormat
 import android.widget.EditText
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.MutableLiveData
@@ -150,4 +151,10 @@ fun <T:Any> Flow<AppState<T>>.applyConnections(
         }
 
     }
+}
+
+
+
+fun convertDate(dateInMilliseconds: Long, dateFormat: String?): String {
+    return DateFormat.format(dateFormat, dateInMilliseconds).toString()
 }

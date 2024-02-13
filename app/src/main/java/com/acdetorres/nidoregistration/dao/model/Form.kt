@@ -7,7 +7,7 @@ import java.sql.Timestamp
 
 @Entity(tableName = "forms")
 data class Form (
-    val timeStamp : Long,
+    val timeStamp : String,
     val relationship : String,
     val firstName : String,
     val lastName : String,
@@ -18,8 +18,8 @@ data class Form (
     val ages : String,
     val currentBrand : String,
     val signatureName : String,
-    val parent : Boolean,
-    val province : String,
+    val parent : String,
+    val provinceId : String,
     val city : String,
     val barangay : String,
     @PrimaryKey(autoGenerate = true)
