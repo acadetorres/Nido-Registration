@@ -1,6 +1,7 @@
 package com.acdetorres.nidoregistration.screens
 
 import android.app.ActionBar.LayoutParams
+import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.media.MediaPlayer
@@ -37,11 +38,9 @@ import com.acdetorres.nidoregistration.clearText
 import com.acdetorres.nidoregistration.databinding.ActivityMainBinding
 import com.acdetorres.nidoregistration.screens.fragments.FragmentViewPager
 import com.acdetorres.nidoregistration.string
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -178,6 +177,26 @@ class MainActivity : AppCompatActivity() {
                 viewModel.didChooseParent = true
             }
 
+            viewModel.loading.observe(context) {
+
+                Log.d("loading val", it.toString())
+                if (it) {
+                    loading.visibility = View.VISIBLE
+                } else {
+                    runOnUiThread {
+                        Log.d("loading false", it.toString())
+                        loading.visibility  = View.GONE
+                    }
+                }
+            }
+
+            viewModel.loggedOut.observe(context) {
+                if (it) {
+                    startActivity(Intent(context, LoginActivity::class.java))
+                    finish()
+                }
+            }
+
             viewModel.provinces.observe(context) {
                 if (it != null) {
 
@@ -231,16 +250,31 @@ class MainActivity : AppCompatActivity() {
 //                    }
 //                        getAllImages(images)
 
+                    Log.d("FORMS NOT NULL, ", forms.toString())
+
 
                     tvSync.setOnClickListener {
-
+                        if (forms.isEmpty()) {
+                            DialogNotice("No records to sync").show(supportFragmentManager, null)
+                        }else {
+                            viewModel.syncRecords(forms)
+                        }
+//                        Toast.makeText(this@MainActivity, "asuc", Toast.LENGTH_SHORT).show()
                     }
+                }
+            }
+
+            viewModel.successSync.observe(context) {
+                if (it!= null) {
+                    DialogNotice("Succesfully synced records").show(supportFragmentManager, null)
+                    viewModel.deleteAllRecords()
                 }
             }
 
             viewModel.loggedOnAmbassador.observe(context) {
                 if (it != null) {
                     tvAdminName.text = "Hi ${it.fname}"
+                    viewModel.userId = it.id
                 }
             }
 
@@ -261,6 +295,8 @@ class MainActivity : AppCompatActivity() {
 
                             DialogNotice(
                                 "You have ${it} records, you need to sync first or you will lose all records").show(supportFragmentManager, null)
+                        } else {
+                            viewModel.deleteLoggedOnAmbassador()
                         }
                     }
                 }
@@ -386,7 +422,7 @@ class MainActivity : AppCompatActivity() {
                     etFirstName.string(),
                     etLastName.string(),
                     etDob.string(),
-                    etContactNumber.string(),
+                    sContact.selectedItem.toString() + etContactNumber.string(),
                     etEmailAddress.string(),
                     etNumChild.string(),
                     etAgesChildren.string(),

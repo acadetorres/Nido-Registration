@@ -12,6 +12,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -39,21 +40,21 @@ class AppModule {
                 )
             }
 
-//        val loggingInterceptor = HttpLoggingInterceptor()
-//        loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
-//        okHttpClient.addInterceptor(loggingInterceptor)
-//        okHttpClient.apply {
-//            if (BuildConfig.DEBUG) {
-////                addInterceptor(OkHttpProfilerInterceptor())
-//                addInterceptor(loggingInterceptor)
+        val loggingInterceptor = HttpLoggingInterceptor()
+        loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
+        okHttpClient.addInterceptor(loggingInterceptor)
+        okHttpClient.apply {
+            if (BuildConfig.DEBUG) {
+//                addInterceptor(OkHttpProfilerInterceptor())
+                addInterceptor(loggingInterceptor)
 //                addInterceptor(OkHttpProfilerInterceptor())
 //                Timber.e("DEbug")
-//            } else {
-//                addInterceptor(loggingInterceptor)
-//            }
-//
-//
-//        }
+            } else {
+                addInterceptor(loggingInterceptor)
+            }
+
+
+        }
         return Retrofit.Builder()
             .baseUrl("http://10.0.2.2/nido/api/")
             .client(okHttpClient.build())

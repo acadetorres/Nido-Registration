@@ -6,4 +6,5 @@
     <color name="green">#44ab34</color>
     <color name="dark_green">#12572d</color>
     <color name="grey">#d1d3d4</color>
+    <color name="mask">#60000000</color>
 </resources>

@@ -13,12 +13,11 @@ import com.acdetorres.nidoregistration.dao.model.Form
 import com.acdetorres.nidoregistration.dao.model.Ambassador
 import com.acdetorres.nidoregistration.dao.model.GetProvincesResponse
 import com.acdetorres.nidoregistration.dao.model.LoggedOnAmbassador
-import com.google.gson.Gson
+import com.acdetorres.nidoregistration.dao.model.Meta
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileNotFoundException
@@ -27,6 +26,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ActivityMainViewModel @Inject constructor(private val repository: AppRepository, @ApplicationContext val context : Context) :ViewModel() {
+
+    var userId: String = ""
 
     var selectedProvince = "-1"
 
@@ -43,6 +44,10 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
     private val mError = MutableLiveData<String>()
 
     val error : LiveData<String> get() = mError
+
+    val mSuccessSync = MutableLiveData<Meta?>()
+
+    val successSync : LiveData<Meta?> get() = mSuccessSync
 
     val mSuccessSubmit = MutableLiveData<Pair<Boolean, String>>()
 
@@ -70,6 +75,32 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
 
     private val mProvinces = MutableLiveData<List<GetProvincesResponse.Province>?>()
     val provinces : LiveData<List<GetProvincesResponse.Province>?> get() = mProvinces
+
+    val mLoggedOut = MutableLiveData<Boolean>(false)
+
+    val loggedOut : LiveData<Boolean> get() = mLoggedOut
+
+
+    fun deleteLoggedOnAmbassador() {
+        viewModelScope.launch(IO) {
+            repository.deleteLoggedOnAmbassador().collect {
+                it.handleRepositoryFlowResponse {
+                    mLoggedOut.valueOnMain(true)
+                }
+            }
+        }
+    }
+    fun syncRecords(forms : List<Form>) {
+        viewModelScope.launch(IO) {
+            repository.syncRecords(userId, forms).collect {
+                val meta = it.handleRepositoryFlowResponse()
+                Log.d("SYNC", "THIS SYNC")
+                if (meta != null) {
+                    mSuccessSync.valueOnMain(meta)
+                }
+            }
+        }
+    }
 
     fun getLocalProvinces() {
         viewModelScope.launch(IO) {
@@ -137,9 +168,17 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
         }
     }
 
-    suspend fun deleteAllRecords() {
-        repository.deleteAllRecords().collect {
-            it.handleRepositoryFlowResponse()
+    fun deleteAllRecords() {
+        viewModelScope.launch(IO) {
+            repository.deleteAllRecords().collect {
+                val onSuccess : (Unit) -> Unit = {
+                    getRecordsCount()
+                    getAllRecords()
+                }
+
+                it.handleRepositoryFlowResponse((onSuccess))
+
+            }
         }
     }
 
@@ -264,7 +303,7 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
                 val resultCount = it.handleRepositoryFlowResponse()
 
                 resultCount?.let { result ->
-                    mCount.postValue(result)
+                    mCount.valueOnMain(result)
                 }
 
             }
@@ -350,20 +389,22 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
             }
         }
 
-        private fun <T:Any> AppState<T>.handleRepositoryFlowResponse() : T? {
+        private fun <T:Any> AppState<T>.handleRepositoryFlowResponse(onSuccess: (Unit) -> Unit = {}): T? {
             when (this) {
 
                 is AppState.Progress -> {
+                    Log.d("loading val,", this.isLoading.toString())
                     setLoadingState(this.isLoading)
                 }
                 is AppState.Success -> {
                     Log.d("handleRepositoryFlowResponse", data.toString())
+                    onSuccess(Unit)
                     return this.data
                 }
 
                 is AppState.Error -> {
-                    mError.postValue(message)
-                }
+                    mError.valueOnMain(message)
+                    Log.d("APPSTATE ERROR", message)                }
             }
             return null
         }

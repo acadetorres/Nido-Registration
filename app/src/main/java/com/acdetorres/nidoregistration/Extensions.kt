@@ -3,6 +3,7 @@ package com.acdetorres.nidoregistration
 import android.app.DatePickerDialog
 import android.content.Context
 import android.text.format.DateFormat
+import android.util.Log
 import android.widget.EditText
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.MutableLiveData
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.retryWhen
 import retrofit2.HttpException
+import java.net.ConnectException
 import java.net.UnknownHostException
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -92,10 +94,12 @@ fun <T:Any> Flow<AppState<T>>.applyConnections(
             false
         }
     }.catch { exception ->
+        Log.d("EXCEPTION", exception.message.toString())
         when (exception) {
             is com.google.gson.stream.MalformedJsonException -> {
 //                Timber.e("META ERROR : ${exception.message}")
 //                emit(AppState.Error(MetaResponse("Server Error", "", 0)))
+                emit(AppState.Error("Server Error"))
             }
             is HttpException -> {
                 val errorJsonString = exception.response()?.errorBody()?.string()
@@ -126,12 +130,15 @@ fun <T:Any> Flow<AppState<T>>.applyConnections(
                 }
             }
             is UnknownHostException -> {
-                AppState.Error("No Internet Connectivity")
+                emit(AppState.Error("No Internet Connectivity"))
 //                emit(Resource.Error(MetaResponse("No Internet Connectivity", "", 0)))
 //                Timber.e("META ERROR : ${exception.message}")
             }
+            is ConnectException -> {
+                emit(AppState.Error("No Internet Connectivity"))
+            }
             else -> {
-                AppState.Error(exception.toString())
+                emit(AppState.Error(exception.toString()))
 //                emit(Resource.Error(MetaResponse(exception.toString(), "", 0)))
 //                Timber.e("META ERROR : ${exception.message}")
             }

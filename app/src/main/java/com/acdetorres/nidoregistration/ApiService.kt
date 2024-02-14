@@ -2,10 +2,9 @@ package com.acdetorres.nidoregistration
 
 import com.acdetorres.nidoregistration.dao.model.GetAmbassadorsResponse
 import com.acdetorres.nidoregistration.dao.model.GetProvincesResponse
-import com.acdetorres.nidoregistration.dao.model.MetaResponse
-import kotlinx.coroutines.flow.flow
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
+import com.acdetorres.nidoregistration.dao.model.Meta
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -20,20 +19,22 @@ interface ApiService {
     @GET("registration_api/get_ambassadors")
     suspend fun getAmbassadors(): GetAmbassadorsResponse
 
-    @POST("api/user/{user_id}/batch-registration")
-    @Multipart
+    @POST("user/{user_id}/batch-registration")
+    @FormUrlEncoded
     suspend fun batchSync(
-        @Path("user_id") userId : String,
-        @Part("fname[]") fname : List<RequestBody>,
-        @Part("lname[]") lname : List<RequestBody>,
-        @Part("contact_num[]") contactNum : List<RequestBody>,
-        @Part("email[]") email : List<RequestBody>,
-        @Part("birthday[]") birthday : List<RequestBody>,
-        @Part("relationship[]") relationship : List<RequestBody>,
-        @Part("number_of_children[]") numOfChildren : List<RequestBody>,
-        @Part("current_brand_milk[]") currentBrandOfMilk : List<RequestBody>,
-        @Part("registration_etimestamp[]") registration : List<RequestBody>,
-        @Part("child_age[][]") childAge : List<RequestBody>,
-        @Part signatures : List<MultipartBody.Part>
-    ) : MetaResponse
+        @Path("user_id") userId: String,
+        @Field("fname[]") fname: List<String>,
+        @Field("lname[]") lname: List<String>,
+        @Field("contact_num[]") contactNum: List<String>,
+        @Field("email[]") email: List<String>,
+        @Field("birthday[]") birthday: List<String>,
+        @Field("relationship[]") relationship: List<String>,
+        @Field("number_of_children[]") numOfChildren: List<String>,
+        @Field("current_brand_milk[]") currentBrandOfMilk: List<String>,
+        @Field("registration_etimestamp[]") registration: List<String>,
+        @Field("child_age[]") childAge: List<String>,
+        @Field("province_id[]") provinceId: List<String>,
+        @Field("city[]") city: List<String>,
+        @Field("barangay[]") barangay: List<String>
+    ) : Meta
 }

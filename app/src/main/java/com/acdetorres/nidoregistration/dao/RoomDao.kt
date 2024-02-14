@@ -41,6 +41,9 @@ interface RoomDao {
     @Query("Select * FROM loggedonambassador")
     fun getLoggedOnAmbassador() : LoggedOnAmbassador
 
+    @Query("Delete from loggedonambassador")
+    fun deleteLoggedOnAmbassador() : Int
+
     @Insert(entity = LoggedOnAmbassador::class, onConflict = OnConflictStrategy.REPLACE)
     fun insertLoggedOnAmbassador(
         ambassador: LoggedOnAmbassador
