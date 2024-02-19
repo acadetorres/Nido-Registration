@@ -32,6 +32,10 @@ class AppRepository @Inject constructor(val roomDao :RoomDao, val apiService: Ap
         }
 
         val relationship = forms.map {
+            it.parent
+        }
+
+        val relationshipLabel = forms.map {
             it.relationship
         }
 
@@ -77,7 +81,8 @@ class AppRepository @Inject constructor(val roomDao :RoomDao, val apiService: Ap
             childAges,
             provinceId,
             city,
-            barangay
+            barangay,
+            relationshipLabel
         )
 
 

@@ -428,7 +428,7 @@ class MainActivity : AppCompatActivity() {
                     etAgesChildren.string(),
                     etBrandMilk.string(),
                     System.currentTimeMillis().toString(),
-                    rbConsent.isChecked,
+                    rbLegalParent.isChecked,
                     sProvinces.selectedItem.toString(),
                     etCity.string(),
                     etBarangay.string()

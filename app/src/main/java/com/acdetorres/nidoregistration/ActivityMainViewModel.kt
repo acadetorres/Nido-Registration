@@ -2,8 +2,10 @@ package com.acdetorres.nidoregistration
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.Build
 import android.util.Log
 import android.util.Patterns
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -22,6 +24,10 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -202,6 +208,7 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun submitForm(
         relationship: String,
         firstName: String,
@@ -231,12 +238,20 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
 //            "j",
 //            "k")
 
+        val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.US)
+
+        val newDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+
+        val date = dateFormat.parse(dob)
+
+        val dobFormatted = date?.let { newDateFormat.format(it) }
+
          val form = Form(
              convertDate(System.currentTimeMillis(), "yyyy-MM-dd hh:mm:ss"),
              relationship,
              firstName,
              lastName,
-             dob,
+             dobFormatted.toString(),
              contactNum,
              email,
              numOfChild,

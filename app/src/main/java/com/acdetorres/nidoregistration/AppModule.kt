@@ -41,7 +41,7 @@ class AppModule {
             }
 
         val loggingInterceptor = HttpLoggingInterceptor()
-        loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
+        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
         okHttpClient.addInterceptor(loggingInterceptor)
         okHttpClient.apply {
             if (BuildConfig.DEBUG) {
