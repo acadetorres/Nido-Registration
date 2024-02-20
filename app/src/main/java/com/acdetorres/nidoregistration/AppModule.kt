@@ -2,7 +2,6 @@ package com.acdetorres.nidoregistration
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import com.acdetorres.nidoregistration.dao.AppDB
 import com.acdetorres.nidoregistration.dao.RoomDao
 import com.github.gcacace.signaturepad.BuildConfig
@@ -17,7 +16,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import javax.inject.Singleton
 
 @Module
@@ -56,7 +54,7 @@ class AppModule {
 
         }
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2/nido/api/")
+            .baseUrl("http://nidoapp.tog.com.ph/api/")
             .client(okHttpClient.build())
             .addConverterFactory(GsonConverterFactory.create())
             .addConverterFactory(ScalarsConverterFactory.create())
