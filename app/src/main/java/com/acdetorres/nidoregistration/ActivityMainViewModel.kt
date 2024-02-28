@@ -86,6 +86,9 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
 
     val loggedOut : LiveData<Boolean> get() = mLoggedOut
 
+    fun setError(error : String) {
+        mError.value = error
+    }
 
     fun deleteLoggedOnAmbassador() {
         viewModelScope.launch(IO) {
@@ -241,6 +244,11 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
         val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.US)
 
         val newDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+
+        if (dob.isEmpty()) {
+            mError.valueOnMain("Please select a date of birth")
+            return
+        }
 
         val date = dateFormat.parse(dob)
 
