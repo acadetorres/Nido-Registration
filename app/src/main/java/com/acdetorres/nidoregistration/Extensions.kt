@@ -2,8 +2,10 @@ package com.acdetorres.nidoregistration
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.content.res.Resources
 import android.text.format.DateFormat
 import android.util.Log
+import android.util.TypedValue
 import android.widget.EditText
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.MutableLiveData
@@ -164,4 +166,27 @@ fun <T:Any> Flow<AppState<T>>.applyConnections(
 
 fun convertDate(dateInMilliseconds: Long, dateFormat: String?): String {
     return DateFormat.format(dateFormat, dateInMilliseconds).toString()
+}
+
+fun Int.dpToPx(context : Context): Int {
+    val r: Resources = context.resources
+    return Math.round(
+        TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            this.toFloat(),
+            r.displayMetrics
+        )
+    )
+}
+
+fun EditText.toUpperCaseInput() {
+    this.doOnTextChanged { text, start, before, count ->
+        this.string().forEach {
+            if (it.isLowerCase()) {
+                setText(this.string().uppercase())
+                setSelection(this.string().length)
+            }
+        }
+    }
+
 }
