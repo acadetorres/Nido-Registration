@@ -1,15 +1,17 @@
 package com.acdetorres.nidoregistration.screens
 
 import android.app.ActionBar.LayoutParams
-import android.app.ProgressDialog
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.media.MediaPlayer
 import android.media.MediaPlayer.OnCompletionListener
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.format.DateFormat
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.View
@@ -25,6 +27,8 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.GravityCompat
 import androidx.core.view.children
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
@@ -36,11 +40,14 @@ import com.acdetorres.nidoregistration.R
 import com.acdetorres.nidoregistration.chooseDate
 import com.acdetorres.nidoregistration.clearText
 import com.acdetorres.nidoregistration.databinding.ActivityMainBinding
+import com.acdetorres.nidoregistration.dpToPx
 import com.acdetorres.nidoregistration.screens.fragments.FragmentViewPager
 import com.acdetorres.nidoregistration.string
+import com.acdetorres.nidoregistration.toUpperCaseInput
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -166,6 +173,57 @@ class MainActivity : AppCompatActivity() {
 
             viewModel.getRecordsCount()
 
+            tvMenu.setOnClickListener {
+                drawer.openDrawer(GravityCompat.END)
+            }
+
+
+
+
+            val milkBrands = listOf("NIDO 3+", "LACTUM 3+", "NAN 3+","BONAKID PRE-SCHOOL", "PEDIASURE PLUS",
+                "BEARBRAND FORTIFIED", "BIRCH TREE FORTIFIED", "SIMILAC GAIN SCHOOL","ALASKA FORTIFIED", "PROMIL GOLD FOUR",
+                "ENFAGROW A+", "READY TO DRINK MILK", "FLAVORED MILK DRINK", "OTHER"
+                )
+
+            sBrandMilk.adapter = ArrayAdapter (this@MainActivity, R.layout.simple_dropdown_item, milkBrands)
+            sBrandMilk.selectedItemId
+
+            sBrandMilk.onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    p0: AdapterView<*>?,
+                    p1: View?,
+                    position: Int,
+                    p3: Long
+                ) {
+//                    etBrandMilk.setText(milkBrands[position])
+//                    if (position == 0) {
+//                        viewModel.selectedProvince = "-1"
+//                    } else {
+//                        viewModel.selectedProvince = (data[position-1].id)
+//                        Log.d("data", data[position-1].toString())
+//                    }
+                }
+
+                override fun onNothingSelected(p0: AdapterView<*>?) {
+//                            TODO("Not yet implemented")
+                }
+
+            }
+
+
+
+
+            etCity.toUpperCaseInput()
+
+            etBarangay.toUpperCaseInput()
+
+            etRelationship.toUpperCaseInput()
+
+            etFirstName.toUpperCaseInput()
+
+            etLastName.toUpperCaseInput()
+
+            etEmailAddress.toUpperCaseInput()
 
 
 
@@ -405,6 +463,9 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
+
+
             tvResetAl.setOnClickListener {
                 resetFields()
             }
@@ -417,6 +478,44 @@ class MainActivity : AppCompatActivity() {
 //                    Log.d("Ages:", ages.toString())
 //                }
 
+                val fetchAgesChildren : () -> String = {
+                    val agesChildren = ArrayList<String>()
+                    llAgesChildren.children.forEach { ageEt ->
+                        val age = (ageEt as EditText)
+                        if (age.string().isNotEmpty()) {
+
+                            agesChildren.add(age.text.toString())
+                        }
+                        Log.d("Ages:", agesChildren.toString())
+                    }
+
+                    if (etNumChild.string().isNotEmpty() && agesChildren.size  != etNumChild.string().toInt()) {
+                            ""
+                    } else {
+                        agesChildren.toString()
+                    }
+                }
+
+                var agesChildrenString = fetchAgesChildren()
+
+                if (etNumChild.string().isEmpty()) {
+                    viewModel.setError("You must fill number of children.")
+                    return@setOnClickListener
+                }
+
+                if (agesChildrenString.isEmpty()) {
+                    viewModel.setError("You must fill all ages of children.")
+                    return@setOnClickListener
+                }
+
+                agesChildrenString = agesChildrenString.removePrefix("[")
+
+                agesChildrenString = agesChildrenString.removeSuffix("]")
+
+                Log.d("ages string", agesChildrenString)
+
+
+
                 viewModel.submitForm(
                     etRelationship.string(),
                     etFirstName.string(),
@@ -425,8 +524,8 @@ class MainActivity : AppCompatActivity() {
                     sContact.selectedItem.toString() + etContactNumber.string(),
                     etEmailAddress.string(),
                     etNumChild.string(),
-                    etAgesChildren.string(),
-                    etBrandMilk.string(),
+                    agesChildrenString,
+                    sBrandMilk.selectedItem.toString(),
                     System.currentTimeMillis().toString(),
                     rbLegalParent.isChecked,
                     sProvinces.selectedItem.toString(),
@@ -434,6 +533,17 @@ class MainActivity : AppCompatActivity() {
                     etBarangay.string()
                 )
             }
+
+
+//            val additionalHeight = (vp.paddingTop + vp.paddingBottom
+//                    + (vp.layoutParams as ConstraintLayout.LayoutParams).topMargin
+//                    + (vp.layoutParams as ConstraintLayout.LayoutParams).bottomMargin)
+
+            val width = Resources.getSystem().displayMetrics.widthPixels
+
+            val height = Resources.getSystem().displayMetrics.heightPixels + 48.dpToPx(context)
+
+            vp.layoutParams = LinearLayout.LayoutParams(width, height)
 
             vp.currentItem = 2
 
@@ -462,7 +572,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     if (position > 5) {
-                        drawer.visibility = View.VISIBLE
+                        cvForm.visibility = View.VISIBLE
                     }
 
                     if (position == 7) {
@@ -493,41 +603,63 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            etNumChild.doOnTextChanged { text, start, before, count ->
-
-                etAgesChildren.clearText()
-
-            }
-
-
-            etAgesChildren.doOnTextChanged { text, start, before, count ->
-                if (text != null) {
-                    Log.d("DO ON TEXT", "before $before start $start count $count textLenght ${text.length} numchild empty ${etNumChild.string().isBlank()} ${etNumChild.string().isNotBlank()}")
-                    if (etNumChild.string().isNotBlank()) {
-
-                        if (text.length % 2 != 0 && before == 0 && (text.length / 2 != etNumChild.string()
-                                .toInt())
-                        ) {
-
-                            etAgesChildren.setText("${text},")
-
-
-                        }
-                        if (text.length / 2 == etNumChild.string().toInt()) {
-                            etAgesChildren.setText(text.dropLast(1))
-                        }
-                    } else {
-                        if (etAgesChildren.string().isNotBlank()) {
-                            etAgesChildren.setText("")
-                        }
-                    }
-
-
-                    etAgesChildren.setSelection(etAgesChildren.text.length)
-
-//                    if (c)
+            val clearAgesChildren : () -> Unit = {
+                llAgesChildren.children.forEach {
+                    (it as (EditText)).clearText()
                 }
             }
+
+            val setEnableAgesChildren : (Int) -> Unit = {
+                llAgesChildren.children.forEachIndexed { index, view ->
+                    if (index > it) {
+                        view.isEnabled = false
+                    } else {
+                        (view as (EditText)).isEnabled = true
+                    }
+                }
+
+            }
+
+            etNumChild.doOnTextChanged { text, start, before, count ->
+
+                clearAgesChildren()
+
+                if (etNumChild.string().isNotEmpty()) {
+                    setEnableAgesChildren(etNumChild.string().toInt() -1 )
+                }
+
+
+            }
+
+
+//            etAgesChildren.doOnTextChanged { text, start, before, count ->
+//                if (text != null) {
+//                    Log.d("DO ON TEXT", "before $before start $start count $count textLenght ${text.length} numchild empty ${etNumChild.string().isBlank()} ${etNumChild.string().isNotBlank()}")
+//                    if (etNumChild.string().isNotBlank()) {
+//
+//                        if (text.length % 2 != 0 && before == 0 && (text.length / 2 != etNumChild.string()
+//                                .toInt())
+//                        ) {
+//
+//                            etAgesChildren.setText("${text},")
+//
+//
+//                        }
+//                        if (text.length / 2 == etNumChild.string().toInt()) {
+//                            etAgesChildren.setText(text.dropLast(1))
+//                        }
+//                    } else {
+//                        if (etAgesChildren.string().isNotBlank()) {
+//                            etAgesChildren.setText("")
+//                        }
+//                    }
+//
+//
+//                    etAgesChildren.setSelection(etAgesChildren.text.length)
+//
+////                    if (c)
+//                }
+//            }
 
 
             val formsAgesThemeContext = ContextThemeWrapper(this@MainActivity, R.style.forms_ages)
