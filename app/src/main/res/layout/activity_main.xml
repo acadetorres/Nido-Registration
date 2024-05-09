@@ -822,4 +822,21 @@
         android:layout_marginEnd="30dp"
         android:layout_marginTop="30dp"
         />
+
+    <TextView
+        android:id="@+id/tv_skip_to_register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:backgroundTint="@color/nido_color"
+        android:background="@drawable/shape_button_radius"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="30dp"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

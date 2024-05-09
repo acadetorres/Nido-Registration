@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import com.acdetorres.nidoregistration.R
 import com.acdetorres.nidoregistration.databinding.FragmentViewPagerBinding
 import com.bumptech.glide.Glide
+import timber.log.Timber
 
 class FragmentViewPager(
     val position: Int,
@@ -53,26 +54,32 @@ class FragmentViewPager(
                     R.drawable.functionalbenefit1
                 }
                 3 -> {
-                    R.drawable.functionalbenefit2
+                    R.drawable.functionalbenefit22
                 }
                 4 -> {
-                    R.drawable.functionalbenefit3
+                    R.drawable.functionalbenefit33
                 }
                 5 -> {
-                    R.drawable.functionalbenefit4
+                    R.drawable.brandcomparison6
                 }
                 6 -> {
+                    R.drawable.functionalbenefit4
+                }
+                7 -> {
                     R.drawable.functionalbenefit5
                 }
 
-                else -> {
+                8 -> {
                     cvSkip.visibility = View.GONE
+//                    Timber.e("POSITION $position")
                     R.drawable.probing
 
                 }
+
+                else -> {0}
             }
 
-            if (position != 7) {
+            if (position != 8) {
                 Glide.with(ivIntro)
                     .load(img)
                     .into(ivIntro)

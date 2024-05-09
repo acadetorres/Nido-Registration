@@ -171,6 +171,11 @@ class MainActivity : AppCompatActivity() {
 
             val context = this@MainActivity
 
+            tvSkipToRegister.setOnClickListener {
+                vp.visibility = View.GONE
+                it.visibility = View.GONE
+            }
+
             viewModel.getRecordsCount()
 
             tvMenu.setOnClickListener {
@@ -565,6 +570,7 @@ class MainActivity : AppCompatActivity() {
 
                     if (position == 1) {
                         didAgree = false
+                        tvSkipToRegister.visibility = View.GONE
                     }
                     if (!didAgree && position > 1) {
                         vp.currentItem = 1
@@ -575,8 +581,9 @@ class MainActivity : AppCompatActivity() {
                         cvForm.visibility = View.VISIBLE
                     }
 
-                    if (position == 7) {
+                    if (position == 8) {
                         vp.visibility = View.GONE
+                        tvSkipToRegister.visibility = View.GONE
                     }
 //                    super.onPageSelected(position)
 
@@ -591,7 +598,7 @@ class MainActivity : AppCompatActivity() {
             vp.adapter = object : FragmentStateAdapter (this@MainActivity) {
 
                 override fun getItemCount(): Int {
-                    return 8
+                    return 9
                 }
 
                 override fun createFragment(position: Int): Fragment {
