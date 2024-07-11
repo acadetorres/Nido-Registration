@@ -59,9 +59,12 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <LinearLayout
+                        android:id="@+id/ll_hospital_top"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:baselineAligned="false">
+                        android:baselineAligned="false"
+                        android:visibility="gone"
+                        >
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -73,6 +76,110 @@
 
 
                             <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Doctor's name"
+                                style="@style/defaultText"
+                                />
+
+                            <RelativeLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                >
+
+
+                                <EditText
+                                    android:id="@+id/et_doctors_name"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    style="@style/forms_generic"
+                                    android:layout_marginTop="5dp" />
+
+
+                            </RelativeLayout>
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="15dp"
+                            >
+
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Hospital name"
+                                style="@style/defaultText"
+                                />
+
+
+                            <EditText
+                                android:id="@+id/et_hospitals_name"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                style="@style/forms_generic"
+                                android:textAllCaps="true"
+                                android:layout_marginTop="5dp" />
+
+
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:visibility="invisible"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="100dp"
+                            >
+
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Barangay"
+                                style="@style/defaultText"
+                                />
+
+
+                            <EditText
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                style="@style/forms_generic"
+                                android:textAllCaps="true"
+                                android:enabled="false"
+                                android:layout_marginTop="5dp" />
+
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:id="@+id/ll_household_top"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        >
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_weight="1.3"
+                            android:layout_marginEnd="15dp"
+                            >
+
+
+                            <TextView
+                                android:id="@+id/tv_province"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Province/Area"
@@ -695,7 +802,11 @@
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/vp"
                     android:layout_width="0dp"
-                    android:layout_height="0dp" />
+                    android:layout_height="0dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -828,6 +939,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Register"
+        android:visibility="gone"
         android:textStyle="bold"
         android:textColor="@color/black"
         android:paddingStart="10dp"
