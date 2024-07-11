@@ -23,7 +23,7 @@ class LoginActivity : AppCompatActivity() {
 
     val viewModel by viewModels<ActivityMainViewModel>()
 
-    val binding : ActivityLoginBinding? get() = mBinding!!
+    val binding : ActivityLoginBinding? get() = mBinding
 
     var mBinding : ActivityLoginBinding? = null
 
@@ -35,7 +35,6 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mBinding = ActivityLoginBinding.inflate(layoutInflater)
 
         viewModel.getLoggedOnAmbassador()
 
@@ -46,7 +45,7 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                 finish()
             } else {
-
+                mBinding = ActivityLoginBinding.inflate(layoutInflater)
                 setContentView(binding?.root)
                 fullScreen()
             }
