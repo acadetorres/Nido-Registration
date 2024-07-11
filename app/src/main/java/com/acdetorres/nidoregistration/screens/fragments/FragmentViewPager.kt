@@ -15,6 +15,7 @@ class FragmentViewPager(
     val position: Int,
     val onAgree: (Boolean) -> Unit,
     val dontSkip : () -> Unit,
+    val isHospital : (Boolean) -> Unit
 ) : Fragment() {
 
     var mBinding : FragmentViewPagerBinding? = null
@@ -38,48 +39,66 @@ class FragmentViewPager(
 
         binding?.run {
 
+            tvHospital.setOnClickListener {
+                isHospital(true)
+            }
+
+            tvHouseToHouse.setOnClickListener {
+                isHospital(false)
+            }
+
+            if (position > 0) {
+                ivRegistrationIcon.visibility = View.GONE
+                tvHospital.visibility = View.GONE
+                tvHouseToHouse.visibility = View.GONE
+            } else {
+                ivRegistrationIcon.visibility = View.VISIBLE
+                tvHospital.visibility = View.VISIBLE
+                tvHouseToHouse.visibility = View.VISIBLE
+            }
             Log.d("Position", position.toString())
             val img = when (position) {
                 0 -> {
-                    R.drawable.probing
+                    R.drawable.iv_establishment_selector
                 }
                 1 -> {
                     R.drawable.probing2
                 }
                 2 -> {
-                    cvSkip.visibility = View.VISIBLE
-                    tvDontSkip.setOnClickListener {
-                        dontSkip()
-                    }
-                    R.drawable.functionalbenefit1
+//                    cvSkip.visibility = View.VISIBLE
+//                    tvDontSkip.setOnClickListener {
+//                        dontSkip()
+//                    }
+                    R.drawable.probing3
                 }
                 3 -> {
                     R.drawable.functionalbenefit22
                 }
                 4 -> {
-                    R.drawable.functionalbenefit33
+                    R.drawable.functional_benefit34
                 }
                 5 -> {
                     R.drawable.brandcomparison6
                 }
                 6 -> {
-                    R.drawable.functionalbenefit4
+                    R.drawable.functionalenefit41
                 }
                 7 -> {
-                    R.drawable.functionalbenefit5
+                    R.drawable.nutricheck
                 }
 
                 8 -> {
-                    cvSkip.visibility = View.GONE
+//                    cvSkip.visibility = View.GONE
 //                    Timber.e("POSITION $position")
-                    R.drawable.probing
+                    R.drawable.outro
 
                 }
+
 
                 else -> {0}
             }
 
-            if (position != 8) {
+            if (position != 9) {
                 Glide.with(ivIntro)
                     .load(img)
                     .into(ivIntro)

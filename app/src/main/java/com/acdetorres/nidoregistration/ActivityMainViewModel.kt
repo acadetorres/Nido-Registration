@@ -37,6 +37,8 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
 
     var selectedProvince = "-1"
 
+    var forHospital = false
+
     var didSign = false
 
     var didChooseParent = false

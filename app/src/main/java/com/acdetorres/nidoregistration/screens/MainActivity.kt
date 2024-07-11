@@ -554,6 +554,8 @@ class MainActivity : AppCompatActivity() {
 
             var didAgree = false
 
+            var didChooseEstablishment = false
+
             val onAgree : (Boolean) -> Unit = { it ->
 
                 didAgree = it
@@ -565,8 +567,31 @@ class MainActivity : AppCompatActivity() {
                 vp.currentItem = 3
             }
 
+            val isHospital : (Boolean) -> Unit = { isHospital ->
+
+                viewModel.forHospital = isHospital
+                vp.currentItem = 1
+                didChooseEstablishment = true
+
+                if (isHospital) {
+                    llHospitalTop.visibility = View.VISIBLE
+                    llHouseholdTop.visibility = View.GONE
+                } else {
+                    llHouseholdTop.visibility = View.VISIBLE
+                    llHospitalTop.visibility = View.GONE
+                }
+
+            }
+
             vp.registerOnPageChangeCallback(object : OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
+
+                    if (position > 0 && didChooseEstablishment == false) {
+                        vp.currentItem = 0
+                        Toast.makeText(this@MainActivity, "Please choose establishment", Toast.LENGTH_SHORT).show()                    }
+                    if (position == 0) {
+                        didChooseEstablishment = false
+                    }
 
                     if (position == 1) {
                         didAgree = false
@@ -581,7 +606,7 @@ class MainActivity : AppCompatActivity() {
                         cvForm.visibility = View.VISIBLE
                     }
 
-                    if (position == 8) {
+                    if (position == 9) {
                         vp.visibility = View.GONE
                         tvSkipToRegister.visibility = View.GONE
                     }
@@ -598,13 +623,13 @@ class MainActivity : AppCompatActivity() {
             vp.adapter = object : FragmentStateAdapter (this@MainActivity) {
 
                 override fun getItemCount(): Int {
-                    return 9
+                    return 10
                 }
 
                 override fun createFragment(position: Int): Fragment {
 
 
-                    return FragmentViewPager(position, onAgree, dontSkip)
+                    return FragmentViewPager(position, onAgree, dontSkip, isHospital)
 
 
                 }
