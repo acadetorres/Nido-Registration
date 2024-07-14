@@ -4,14 +4,12 @@ import android.app.ActionBar.LayoutParams
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Bitmap
-import android.graphics.Rect
 import android.media.MediaPlayer
 import android.media.MediaPlayer.OnCompletionListener
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.View
@@ -27,7 +25,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.GravityCompat
 import androidx.core.view.children
 import androidx.core.widget.doOnTextChanged
@@ -47,7 +44,6 @@ import com.acdetorres.nidoregistration.toUpperCaseInput
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -112,6 +108,8 @@ class MainActivity : AppCompatActivity() {
         viewModel.getLocalAmbassadors()
         viewModel.getLoggedOnAmbassador()
         viewModel.getLocalProvinces()
+
+
 
 //        val regionsString = this.assets.open("provinces.json").bufferedReader().use {
 //            it.readText()
@@ -217,6 +215,9 @@ class MainActivity : AppCompatActivity() {
 
 
 
+            etHospitalsName.toUpperCaseInput()
+
+            etDoctorsName.toUpperCaseInput()
 
             etCity.toUpperCaseInput()
 
@@ -387,7 +388,8 @@ class MainActivity : AppCompatActivity() {
                                 })
 
 
-                                val videoPath = "android.resource://" + packageName + "/" + R.raw.nido
+                                val videoPath = "android.resource://" + packageName + "/" +
+                                        if (viewModel.forHospital.value == false) R.raw.nido else R.raw.nido_nutricheck_portrait
 
                                 videoView.setVideoURI(Uri.parse(videoPath))
 
@@ -535,7 +537,10 @@ class MainActivity : AppCompatActivity() {
                     rbLegalParent.isChecked,
                     sProvinces.selectedItem.toString(),
                     etCity.string(),
-                    etBarangay.string()
+                    etBarangay.string(),
+                    etHospitalsName.string(),
+                    etDoctorsName.string(),
+                    viewModel.forHospital.value!!
                 )
             }
 
@@ -569,9 +574,14 @@ class MainActivity : AppCompatActivity() {
 
             val isHospital : (Boolean) -> Unit = { isHospital ->
 
-                viewModel.forHospital = isHospital
-                vp.currentItem = 1
+
+//                vp.adapter?.notifyDataSetChanged()
+
+                viewModel.forHospital.value = isHospital
                 didChooseEstablishment = true
+                vp.currentItem = 1
+
+//                vp.adapter?.notifyItemChanged(2)
 
                 if (isHospital) {
                     llHospitalTop.visibility = View.VISIBLE
@@ -580,6 +590,7 @@ class MainActivity : AppCompatActivity() {
                     llHouseholdTop.visibility = View.VISIBLE
                     llHospitalTop.visibility = View.GONE
                 }
+
 
             }
 
@@ -591,6 +602,7 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(this@MainActivity, "Please choose establishment", Toast.LENGTH_SHORT).show()                    }
                     if (position == 0) {
                         didChooseEstablishment = false
+                        resetFields()
                     }
 
                     if (position == 1) {
@@ -606,7 +618,13 @@ class MainActivity : AppCompatActivity() {
                         cvForm.visibility = View.VISIBLE
                     }
 
-                    if (position == 9) {
+//                    if (viewModel.forHospital && position) {
+//                        cvForm.visibility = View.GONE
+//                        llAgesChildren.visibility = View.GONE
+//                        tvSkipToRegister.visibility = View.VISIBLE
+//                    }
+
+                    if (position == 9 || (position == 8 && viewModel.forHospital.value == false)) {
                         vp.visibility = View.GONE
                         tvSkipToRegister.visibility = View.GONE
                     }
@@ -622,17 +640,17 @@ class MainActivity : AppCompatActivity() {
 
             vp.adapter = object : FragmentStateAdapter (this@MainActivity) {
 
+
+
                 override fun getItemCount(): Int {
                     return 10
                 }
 
                 override fun createFragment(position: Int): Fragment {
-
-
-                    return FragmentViewPager(position, onAgree, dontSkip, isHospital)
-
-
+                    return FragmentViewPager(position, onAgree, dontSkip, isHospital, viewModel.forHospital)
                 }
+
+
             }
 
             val clearAgesChildren : () -> Unit = {
@@ -797,6 +815,8 @@ class MainActivity : AppCompatActivity() {
                 (it as EditText).clearText()
             }
             etBrandMilk.clearText()
+            etHospitalsName.clearText()
+            etHospitalsName.clearText()
             viewModel.didSign = false
         }
     }
@@ -806,6 +826,15 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         fullScreen()
+
+//        binding?.run {
+//            videoView.visibility = View.VISIBLE
+//            val videoPath = "android.resource://" + packageName + "/" + R.raw.nido_nutricheck_portrait
+//
+//            videoView.setVideoURI(Uri.parse(videoPath))
+//
+//            videoView.start()
+//        }
 
     }
 
@@ -827,4 +856,6 @@ class MainActivity : AppCompatActivity() {
     fun convertDate(dateInMilliseconds: String, dateFormat: String?): String? {
         return DateFormat.format(dateFormat, dateInMilliseconds.toLong()).toString()
     }
+
+
 }
