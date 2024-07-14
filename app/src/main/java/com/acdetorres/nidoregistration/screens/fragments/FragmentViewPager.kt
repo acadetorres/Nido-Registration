@@ -6,17 +6,21 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.lifecycle.MutableLiveData
 import com.acdetorres.nidoregistration.R
 import com.acdetorres.nidoregistration.databinding.FragmentViewPagerBinding
-import com.bumptech.glide.Glide
-import timber.log.Timber
 
 class FragmentViewPager(
     val position: Int,
     val onAgree: (Boolean) -> Unit,
-    val dontSkip : () -> Unit,
-    val isHospital : (Boolean) -> Unit
+    val dontSkip: () -> Unit,
+    val isHospital: (Boolean) -> Unit,
+    val forHospital: MutableLiveData<Boolean>
 ) : Fragment() {
+
+
+//    var forHospital = false
 
     var mBinding : FragmentViewPagerBinding? = null
 
@@ -39,12 +43,15 @@ class FragmentViewPager(
 
         binding?.run {
 
+
             tvHospital.setOnClickListener {
                 isHospital(true)
+//                forHospital = true
             }
 
             tvHouseToHouse.setOnClickListener {
                 isHospital(false)
+//                forHospital = false
             }
 
             if (position > 0) {
@@ -57,52 +64,69 @@ class FragmentViewPager(
                 tvHouseToHouse.visibility = View.VISIBLE
             }
             Log.d("Position", position.toString())
-            val img = when (position) {
-                0 -> {
-                    R.drawable.iv_establishment_selector
-                }
-                1 -> {
-                    R.drawable.probing2
-                }
-                2 -> {
+
+            forHospital.observe(viewLifecycleOwner) {
+
+                val img = when (position) {
+                    0 -> {
+                        R.drawable.iv_establishment_selector
+                    }
+                    1 -> {
+                        R.drawable.probing2
+                    }
+                    2 -> {
 //                    cvSkip.visibility = View.VISIBLE
 //                    tvDontSkip.setOnClickListener {
 //                        dontSkip()
 //                    }
-                    R.drawable.probing3
-                }
-                3 -> {
-                    R.drawable.functionalbenefit22
-                }
-                4 -> {
-                    R.drawable.functional_benefit34
-                }
-                5 -> {
-                    R.drawable.brandcomparison6
-                }
-                6 -> {
-                    R.drawable.functionalenefit41
-                }
-                7 -> {
-                    R.drawable.nutricheck
-                }
+                        if (it) R.drawable.probing3 else R.drawable.functionalbenefit1
+                    }
+                    3 -> {
+                        R.drawable.functionalbenefit22
+                    }
+                    4 -> {
+                        if (it) R.drawable.functional_benefit34 else R.drawable.functionalbenefit33
+                    }
+                    5 -> {
+                        R.drawable.brandcomparison6
+                    }
+                    6 -> {
+                        if (it) R.drawable.functionalenefit41 else R.drawable.functionalbenefit4
+                    }
+                    7 -> {
+                        if (it) R.drawable.nutricheck else R.drawable.functionalbenefit5
+                    }
 
-                8 -> {
+                    8 -> {
 //                    cvSkip.visibility = View.GONE
 //                    Timber.e("POSITION $position")
-                    R.drawable.outro
+                        R.drawable.outro
 
+                    }
+
+
+                    else -> {
+                        0
+                    }
+                }
+
+                if (forHospital.value == false && position == 8) {
+                    ivIntro.visibility = View.GONE
+                } else {
+                    ivIntro.visibility = View.VISIBLE
                 }
 
 
-                else -> {0}
+                if (position != 9) {
+                    ivIntro.setImageDrawable(context?.let { AppCompatResources.getDrawable(it, img ) })
+//                Glide.with(ivIntro)
+//                    .load(img)
+//                    .into(ivIntro)
+                }
+
             }
 
-            if (position != 9) {
-                Glide.with(ivIntro)
-                    .load(img)
-                    .into(ivIntro)
-            }
+
 
             if (position == 1) {
                 vIAgree.setOnClickListener {
