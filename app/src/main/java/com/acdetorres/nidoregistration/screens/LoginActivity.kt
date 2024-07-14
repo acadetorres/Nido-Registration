@@ -59,8 +59,6 @@ class LoginActivity : AppCompatActivity() {
 
         viewModel.getLoggedOnAmbassador()
 
-        binding?.run {
-
 
 
 //
@@ -75,49 +73,59 @@ class LoginActivity : AppCompatActivity() {
             viewModel.ambassador.observe(this@LoginActivity) { ambassadors ->
 
 
-                tvLogin.setOnClickListener {
-                    if (!ambassadors.isNullOrEmpty()) {
+                binding?.run {
+                    tvLogin.setOnClickListener {
+                        if (etEmail.string().isEmpty() || etPassword.string().isEmpty()) {
+                            Toast.makeText(
+                                this@LoginActivity,
+                                "You must fill all fields.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return@setOnClickListener
+                        }
+                        Log.d("CLICK", ambassadors.toString())
+                        if (!ambassadors.isNullOrEmpty()) {
 
-                        Log.d("ambassador filter", ambassadors.toString())
+                            Log.d("ambassador filter", ambassadors.toString())
 
 
-                        val bcrypt = BCryptPasswordEncoder()
+                            val bcrypt = BCryptPasswordEncoder()
 //                        val isPasswordMatches: Boolean = bcrypt.matches(
 //                            etPassword.string(),
 //                            encryptedPasswordFromDb
 //                        )
-                        val loginResult = ambassadors.filter {
-                            it.email == etEmail.string() && bcrypt.matches(
-                                etPassword.string(),
-                                it.password
-                            )
-                        }
+                            val loginResult = ambassadors.filter {
+                                it.email == etEmail.string() && bcrypt.matches(
+                                    etPassword.string(),
+                                    it.password
+                                )
+                            }
 
-                        Log.d("ambassador filter", ambassadors.toString())
+                            Log.d("ambassador filter", ambassadors.toString())
 
-                        if (loginResult.isNotEmpty()) {
+                            if (loginResult.isNotEmpty()) {
 
-                            viewModel.insertLoggedOnAmbassador(loginResult.first())
+                                viewModel.insertLoggedOnAmbassador(loginResult.first())
 
-                            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                            finish()
+                                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                                finish()
+                            } else {
+                                Toast.makeText(
+                                    this@LoginActivity,
+                                    "Wrong credentials",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         } else {
                             Toast.makeText(
                                 this@LoginActivity,
-                                "Wrong credentials",
+                                "You need to connect first to the internet and restart app to download credentials.",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-                    } else {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "You need to connect first to the internet and restart app to download credentials.",
-                            Toast.LENGTH_SHORT
-                        ).show()
                     }
                 }
             }
-        }
 
 
     }
