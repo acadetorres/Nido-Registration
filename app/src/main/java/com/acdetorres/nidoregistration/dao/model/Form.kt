@@ -22,6 +22,9 @@ data class Form (
     val provinceId : String,
     val city : String,
     val barangay : String,
+    val hospitalName : String,
+    val doctorName: String,
+    val forHospital : Boolean,
     @PrimaryKey(autoGenerate = true)
     val id : Int = 0,
     )

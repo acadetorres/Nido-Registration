@@ -67,6 +67,20 @@ class AppRepository @Inject constructor(val roomDao :RoomDao, val apiService: Ap
             it.barangay
         }
 
+        val docName = forms.map {
+            it.doctorName
+        }
+
+        val hospitalName = forms.map {
+            it.hospitalName
+        }
+
+        val regType = forms.map {
+            it.forHospital
+        }.map {
+            if (it) "2" else "1"
+        }
+
         val response = apiService.batchSync(
             userId,
             fNameRequestBody,
@@ -82,7 +96,10 @@ class AppRepository @Inject constructor(val roomDao :RoomDao, val apiService: Ap
             provinceId,
             city,
             barangay,
-            relationshipLabel
+            relationshipLabel,
+            doctorsName = docName,
+            hospitalNames = hospitalName,
+            registrationType = regType
         )
 
 

@@ -36,6 +36,9 @@ interface ApiService {
         @Field("province_id[]") provinceId: List<String>,
         @Field("city[]") city: List<String>,
         @Field("barangay[]") barangay: List<String>,
-        @Field("relationship_label[]") relationshipLabel: List<String>
+        @Field("relationship_label[]") relationshipLabel: List<String>,
+        @Field("registration_type[]") registrationType: List<String>,
+        @Field("doctors_name[]") doctorsName : List<String>,
+        @Field("hospital_name[]") hospitalNames : List<String>,
     ) : Meta
 }

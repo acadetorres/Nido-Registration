@@ -2,10 +2,8 @@ package com.acdetorres.nidoregistration
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.Build
 import android.util.Log
 import android.util.Patterns
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -21,12 +19,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
 
@@ -37,7 +34,9 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
 
     var selectedProvince = "-1"
 
-    var forHospital = false
+//   - var forHospital = false
+
+    val forHospital = MutableLiveData(false)
 
     var didSign = false
 
@@ -213,7 +212,7 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+
     fun submitForm(
         relationship: String,
         firstName: String,
@@ -225,10 +224,13 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
         agesChildren: String,
         currentBrand: String,
         timeStamp: String,
-        parent : Boolean,
-        province : String,
-        city : String,
-        barangay : String
+        parent: Boolean,
+        province: String,
+        city: String,
+        barangay: String,
+        hospitalName: String,
+        doctorName: String,
+        forHospital: Boolean
     ) {
 //        val form = Form(
 //            System.currentTimeMillis(),
@@ -271,7 +273,11 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
              if (parent) "1" else "2",
              selectedProvince,
              city,
-             barangay)
+             barangay,
+             hospitalName,
+             doctorName,
+             forHospital
+             )
 
 
         Log.d("Ages Prior Convert", agesChildren.toString())
@@ -337,7 +343,23 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
 
     private fun validateForm(form: Form): Boolean {
 
-        if (form.provinceId == "-1") {
+
+        Timber.e("FORM ${form.toString()}")
+
+        Timber.tag("Form").d(form.toString())
+
+        if (form.forHospital && form.doctorName.isEmpty()) {
+            mError.postValue("Please fill doctor's name")
+            return false
+        }
+
+        if (form.forHospital && form.hospitalName.isEmpty()) {
+
+            mError.postValue("Please fill hospital's name")
+            return false
+        }
+
+        if (!form.forHospital && form.provinceId == "-1") {
             mError.postValue("Please select a province")
             return false
         }
@@ -347,12 +369,12 @@ class ActivityMainViewModel @Inject constructor(private val repository: AppRepos
 //            return false
 //        }
 
-        if (form.city.isEmpty()) {
+        if (!form.forHospital && form.city.isEmpty()) {
             mError.value = "Please input city"
             return false
         }
 
-        if (form.barangay.isEmpty()) {
+        if (!form.forHospital && form.barangay.isEmpty()) {
             mError.value = "Please input barangay"
             return false
         }
