@@ -389,7 +389,7 @@ class MainActivity : AppCompatActivity() {
 
 
                                 val videoPath = "android.resource://" + packageName + "/" +
-                                        if (viewModel.forHospital.value == false) R.raw.nido else R.raw.nido_nutricheck_portrait
+                                        if (viewModel.forHospital.value == false) R.raw.nido else R.raw.nido_hospital
 
                                 videoView.setVideoURI(Uri.parse(videoPath))
 
